@@ -1,0 +1,149 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --base-font-size: 16px;
+  --header-font-size: 16px;
+}
+
+/* 超小屏幕（手机竖屏） */
+@media (max-width: 480px) {
+  :root {
+    --base-font-size: 4vw;
+    --header-font-size: 6vw;
+  }
+}
+
+/* 小屏幕（手机横屏） */
+@media (min-width: 481px) and (max-width: 600px) {
+  :root {
+    --base-font-size: 3.5vw;
+    --header-font-size: 5.5vw;
+  }
+}
+
+/* 中等屏幕（平板） */
+@media (min-width: 601px) and (max-width: 1024px) {
+  :root {
+    --base-font-size: 2.5vw;
+    --header-font-size: 4.5vw;
+  }
+}
+
+/* 大屏幕（桌面） */
+@media (min-width: 1025px) {
+  :root {
+    --base-font-size: 3.5vw;
+    --header-font-size: 5.5vw;
+  }
+}
+
+/* 基本样式 */
+body {
+  font-size: var(--base-font-size);
+  background-image: url("./assets/bg.webp");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.flex {
+  display: flex;
+}
+
+.gap-10 {
+  gap: 10px;
+}
+
+.agent-container {
+  width: 100vw;
+  height: 100vh;
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  background-size: auto 70%;
+}
+
+.content-box {
+  padding: 1vw 1vh;
+  border: 1px solid #fff;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.content-box.thinking {
+  width: 70vw;
+  max-height: 30vh;
+  overflow: auto;
+}
+
+.content-box.statement {
+  width: 50vw;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.game-thinking-header,
+.game-statement-header {
+  color: #fff;
+  font-size: var(--header-font-size);
+  padding: 20px 0;
+}
+
+.game-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1vw 1vh;
+}
+
+.dark-bg {
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-bg.dark {
+  background: rgba(0, 0, 0, 0.95);
+}
+
+.choose-fact {
+  padding: 40px;
+  font-size: 40px;
+}
+
+.out-marker {
+  color: #fff;
+  font-size: 20px;
+  padding: 20px;
+  width: 30vw;
+  height: 30vw;
+  border: 5px solid #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  font-size: 10vw;
+}
+
+.under-cover-marker {
+  color: #f00;
+  font-size: 20px;
+  padding: 20px;
+  width: 30vw;
+  height: 30vw;
+  border: 5px solid #f00;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  font-size: 10vw;
+}
