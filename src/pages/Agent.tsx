@@ -42,9 +42,12 @@ const Agent: React.FC = () => {
       if (message.content_type === GameStatus.AgentSpeakThinking) {
         if (outAgentNumbers.includes(message.agent_id)) {
           return;
+        } else {
+          setShowMessage(false);
         }
         setGameStarted(true);
         setShowSpeakMarker(true);
+
         if (
           message.agent_id &&
           id?.toString() === message.agent_id.toString()
