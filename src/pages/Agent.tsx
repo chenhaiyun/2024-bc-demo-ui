@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GameStatus, MessageType } from "src/assets/ts/types";
 import { WEBSOCKET_URL } from "src/assets/ts/utils";
-
+import QR_CODE from "src/assets/qrcode.png";
 const Agent: React.FC = () => {
   const { id } = useParams();
   const [thinkingMessage, setThinkingMessage] = useState("");
@@ -24,6 +24,8 @@ const Agent: React.FC = () => {
   const [showUnderCoverMarker, setShowUnderCoverMarker] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [messageContent, setMessageContent] = useState("");
+  const [showResult, setShowResult] = useState(false);
+  const [resultMessage, setResultMessage] = useState("");
 
   useEffect(() => {
     try {
@@ -130,6 +132,16 @@ const Agent: React.FC = () => {
           }
         }
       }
+
+      // Undercover Found
+      if (message.content_type === GameStatus.GameEnd) {
+        setShowResult(true);
+        if (id?.toString() === message.trueUnderCover.toString()) {
+          setResultMessage("青花瓷");
+        } else {
+          setResultMessage("白瓷");
+        }
+      }
     } catch (error) {
       console.info(error);
     }
@@ -168,13 +180,26 @@ const Agent: React.FC = () => {
       {showOutMarker && (
         <div className="dark-bg dark">
           <div className="out-marker">出局</div>
+          {showResult && (
+            <>
+              <div className="game-thinking-header">{resultMessage}</div>
+              <img width="40%" src={QR_CODE} />
+            </>
+          )}
         </div>
       )}
       {showUnderCoverMarker && (
         <div className="dark-bg">
           <div className="under-cover-marker">卧底</div>
+          {showResult && (
+            <>
+              <div className="game-thinking-header">{resultMessage}</div>
+              <img width="40%" src={QR_CODE} />
+            </>
+          )}
         </div>
       )}
+
       {showChooseFact && (
         <div className="dark-bg">
           <div className="game-thinking-header">请为 Agent 选择思考方向</div>

@@ -26,6 +26,7 @@ const TestSend: React.FC = () => {
   });
 
   const [underCoverNum, setUnderCoverNum] = useState(1);
+  const [voteUnderCover, setVoteUnderCover] = useState(0);
 
   useEffect(() => {
     console.info("lastMessage:", lastMessage);
@@ -121,6 +122,7 @@ const TestSend: React.FC = () => {
   // Agent Vote End
   const agentVoteEnd = () => {
     const underCover = randomNum();
+    setVoteUnderCover(underCover);
     sendMessage(
       JSON.stringify({
         agent_id: underCover,
@@ -133,9 +135,17 @@ const TestSend: React.FC = () => {
   };
 
   // Find the agent who is undercover
-  //   const findUndercover = () => {
-
-  //   };
+  const findUndercover = () => {
+    sendMessage(
+      JSON.stringify({
+        agent_id: 0,
+        content_type: GameStatus.GameEnd,
+        content: `卧底是 ${underCoverNum} 号 Agent`,
+        voteUnderCover: voteUnderCover,
+        trueUnderCover: underCoverNum,
+      })
+    );
+  };
 
   return (
     <div
@@ -242,7 +252,7 @@ const TestSend: React.FC = () => {
 
           <Button
             onClick={() => {
-              //   findUndercover();
+              findUndercover();
             }}
           >
             找出卧底
