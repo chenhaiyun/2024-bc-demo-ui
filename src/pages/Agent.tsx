@@ -118,6 +118,9 @@ const Agent: React.FC = () => {
 
       // Agent Vote End
       if (message.content_type === GameStatus.TurnVoteEnd) {
+        // if (roundNumber === 2) {
+        //   message.voteUnderCover = 1
+        // }
         setShowSpeakMarker(false);
         setShowMessage(true);
         setMessageContent(message.content);
@@ -170,6 +173,12 @@ const Agent: React.FC = () => {
           <div className="game-thinking-header">
             {gameStarted ? "思考中..." : "已分配关键词，游戏即将开始"}
           </div>
+          {showResult && (
+            <>
+              <div className="game-thinking-header">{resultMessage}</div>
+              <img width="40%" src={QR_CODE} />
+            </>
+          )}
         </div>
       )}
       {showMessage && (

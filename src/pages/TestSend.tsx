@@ -27,6 +27,7 @@ const TestSend: React.FC = () => {
 
   const [underCoverNum, setUnderCoverNum] = useState(1);
   const [voteUnderCover, setVoteUnderCover] = useState(0);
+  const [voteRound, setVoteRound] = useState(1);
 
   useEffect(() => {
     console.info("lastMessage:", lastMessage);
@@ -46,7 +47,7 @@ const TestSend: React.FC = () => {
       JSON.stringify({
         agent_id: 0,
         content_type: GameStatus.GameBegin,
-        content: generateRandomChineseSentence(300),
+        content: '',
       })
     );
   };
@@ -57,7 +58,7 @@ const TestSend: React.FC = () => {
       JSON.stringify({
         agent_id: agentId,
         content_type: GameStatus.AgentSpeakThinking,
-        content: generateRandomChineseSentence(300),
+        content: generateRandomChineseSentence(200),
       })
     );
   };
@@ -68,7 +69,7 @@ const TestSend: React.FC = () => {
       JSON.stringify({
         agent_id: agentId,
         content_type: GameStatus.AgentSpeak,
-        content: generateRandomChineseSentence(200),
+        content: generateRandomChineseSentence(150),
       })
     );
   };
@@ -101,7 +102,7 @@ const TestSend: React.FC = () => {
       JSON.stringify({
         agent_id: agentId,
         content_type: GameStatus.AgentVoteThinking,
-        content: generateRandomChineseSentence(200),
+        content: generateRandomChineseSentence(130),
       })
     );
   };
@@ -112,16 +113,17 @@ const TestSend: React.FC = () => {
       JSON.stringify({
         agent_id: agentId,
         content_type: GameStatus.AgentVote,
-        content: `经过思考：${generateRandomChineseSentence(
-          10
-        )}， 我决定投票给 ${randomNum()} 号 Agent`,
+        content: `经过思考， 我决定投票给 ${randomNum()} 号 Agent`,
       })
     );
   };
 
   // Agent Vote End
   const agentVoteEnd = () => {
-    const underCover = randomNum();
+    let underCover = randomNum();
+    if (voteRound > 1) {
+      underCover =1 
+    } 
     setVoteUnderCover(underCover);
     sendMessage(
       JSON.stringify({
@@ -132,6 +134,7 @@ const TestSend: React.FC = () => {
         trueUnderCover: underCoverNum,
       })
     );
+    setVoteRound((prev)=>prev+1)
   };
 
   // Find the agent who is undercover

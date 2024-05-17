@@ -72,7 +72,7 @@ body {
 }
 
 .content-box.thinking {
-  width: 70vw;
+  width: 65vw;
   max-height: 30vh;
   overflow: auto;
 }
