@@ -27,3 +27,9 @@ export interface MessageType {
   voteUnderCover: number;
   trueUnderCover: number;
 }
+
+export interface GameWordsType {
+  undercover_word: string;
+  common_word: string;
+  prefer_words: string[];
+}

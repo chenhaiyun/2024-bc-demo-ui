@@ -1,4 +1,6 @@
 import {
+  SelectProps,
+  Spinner,
   StatusIndicator,
   StatusIndicatorProps,
 } from "@cloudscape-design/components";
@@ -6,13 +8,23 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GameStatus, MessageType } from "src/assets/ts/types";
-import { WEBSOCKET_URL } from "src/assets/ts/utils";
+import {
+  API_URL,
+  CURRENT_GAME_WORDS,
+  WEBSOCKET_URL,
+} from "src/assets/ts/utils";
 import QR_CODE from "src/assets/qrcode.png";
+import Countdown, { CountdownRenderProps } from "react-countdown";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+
 const Agent: React.FC = () => {
   const { id } = useParams();
   const [thinkingMessage, setThinkingMessage] = useState("");
   const [speakMessage, setSpeakMessage] = useState("");
-  const { lastMessage, readyState } = useWebSocket(WEBSOCKET_URL);
+  const { lastMessage, readyState } = useWebSocket(
+    `${WEBSOCKET_URL}/game/ws/${id}`
+  );
   const [showChooseFact, setShowChooseFact] = useState(false);
   const [showReadyVote, setShowReadyVote] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>("");
@@ -26,10 +38,60 @@ const Agent: React.FC = () => {
   const [messageContent, setMessageContent] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
+  const [preferWords, setPreferWords] = useState<string[]>([]);
+  const [loadingSetPrefer, setLoadingSetPrefer] = useState(false);
+
+  const renderer = ({ seconds, completed }: CountdownRenderProps) => {
+    if (completed) {
+      setShowChooseFact(false);
+      // Render a completed state
+      return <></>;
+    } else {
+      // Render a countdown
+      return (
+        <div className="game-thinking-header">
+          00:{seconds > 9 ? seconds : `0${seconds}`} 秒后将随机选择
+        </div>
+      );
+    }
+  };
+
+  // Start Game
+  const setAgent2PreferWord = (word: string) => {
+    setLoadingSetPrefer(true);
+    const payload = {
+      prefer_words_in: word,
+    };
+    axios
+      .post(`${API_URL}/game/second-agent-prefer-words`, payload)
+      .then((res) => {
+        console.log(res);
+        setShowChooseFact(false);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoadingSetPrefer(false);
+      });
+  };
+
+  useEffect(() => {
+    const words = localStorage.getItem(CURRENT_GAME_WORDS);
+    if (words) {
+      const data: SelectProps.Option = JSON.parse(words);
+      setPreferWords((data.tags as string[]) ?? []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localStorage.getItem(CURRENT_GAME_WORDS)]);
 
   useEffect(() => {
     try {
-      const message: MessageType = JSON.parse(lastMessage?.data || "");
+      const message: MessageType = JSON.parse(lastMessage?.data ?? "");
       setCurrentStatus(message.content_type);
 
       // Start Game
@@ -48,14 +110,14 @@ const Agent: React.FC = () => {
           setShowMessage(false);
         }
         setGameStarted(true);
-        setShowSpeakMarker(true);
-
         if (
           message.agent_id &&
           id?.toString() === message.agent_id.toString()
         ) {
           setShowSpeakMarker(false);
-          setThinkingMessage(message.content);
+          setThinkingMessage((prev) => {
+            return prev + message.content;
+          });
         }
       }
 
@@ -65,13 +127,14 @@ const Agent: React.FC = () => {
           message.agent_id &&
           id?.toString() === message.agent_id.toString()
         ) {
-          setSpeakMessage(message.content);
+          setSpeakMessage((prev) => {
+            return prev + message.content;
+          });
         }
       }
 
       // Agent Speak choose
       if (message.content_type === GameStatus.AgentSpeakChoose) {
-        setShowSpeakMarker(true);
         if (
           message.agent_id &&
           id?.toString() === message.agent_id.toString()
@@ -81,11 +144,8 @@ const Agent: React.FC = () => {
         }
       }
 
-      // Agent Speak end
-      if (
-        message.agent_id &&
-        message.content_type === GameStatus.AgentSpeakEnd
-      ) {
+      // Agent Turn Speak end
+      if (message.content_type === GameStatus.TurnSpeakEnd) {
         setShowSpeakMarker(false);
         setShowChooseFact(false);
         setShowReadyVote(true);
@@ -96,14 +156,15 @@ const Agent: React.FC = () => {
 
       // Agent Vote Thinking
       if (message.content_type === GameStatus.AgentVoteThinking) {
-        setShowSpeakMarker(true);
         if (
           message.agent_id &&
           id?.toString() === message.agent_id.toString()
         ) {
           setShowReadyVote(false);
           setShowSpeakMarker(false);
-          setThinkingMessage(message.content);
+          setThinkingMessage((prev) => {
+            return prev + message.content;
+          });
         }
       }
 
@@ -113,37 +174,35 @@ const Agent: React.FC = () => {
         id?.toString() === message.agent_id.toString() &&
         message.content_type === GameStatus.AgentVote
       ) {
-        setSpeakMessage(message.content);
+        setSpeakMessage((prev) => {
+          return prev + message.content;
+        });
       }
 
       // Agent Vote End
       if (message.content_type === GameStatus.TurnVoteEnd) {
-        // if (roundNumber === 2) {
-        //   message.voteUnderCover = 1
+        // setShowSpeakMarker(false);
+        // setShowMessage(true);
+        // setMessageContent(message.content);
+        // if (id?.toString() === message.agent_id.toString()) {
+        //   setShowMessage(false);
+        //   if (message.voteUnderCover === message.trueUnderCover) {
+        //     setShowUnderCoverMarker(true);
+        //   } else {
+        //     setOutAgentNumbers((prev) => [...prev, message.agent_id]);
+        //     setShowOutMarker(true);
+        //   }
         // }
-        setShowSpeakMarker(false);
-        setShowMessage(true);
-        setMessageContent(message.content);
-        if (id?.toString() === message.agent_id.toString()) {
-          setShowMessage(false);
-          // setShowOutMarker(true);
-          if (message.voteUnderCover === message.trueUnderCover) {
-            setShowUnderCoverMarker(true);
-          } else {
-            setOutAgentNumbers((prev) => [...prev, message.agent_id]);
-            setShowOutMarker(true);
-          }
-        }
       }
 
       // Undercover Found
       if (message.content_type === GameStatus.GameEnd) {
-        setShowResult(true);
-        if (id?.toString() === message.trueUnderCover.toString()) {
-          setResultMessage("青花瓷");
-        } else {
-          setResultMessage("白瓷");
-        }
+        // setShowResult(true);
+        // if (id?.toString() === message.trueUnderCover.toString()) {
+        //   setResultMessage("青花瓷");
+        // } else {
+        //   setResultMessage("白瓷");
+        // }
       }
     } catch (error) {
       console.info(error);
@@ -176,7 +235,7 @@ const Agent: React.FC = () => {
           {showResult && (
             <>
               <div className="game-thinking-header">{resultMessage}</div>
-              <img width="40%" src={QR_CODE} />
+              <img alt="scan code" width="40%" src={QR_CODE} />
             </>
           )}
         </div>
@@ -192,7 +251,7 @@ const Agent: React.FC = () => {
           {showResult && (
             <>
               <div className="game-thinking-header">{resultMessage}</div>
-              <img width="40%" src={QR_CODE} />
+              <img alt="scan code" width="40%" src={QR_CODE} />
             </>
           )}
         </div>
@@ -203,7 +262,7 @@ const Agent: React.FC = () => {
           {showResult && (
             <>
               <div className="game-thinking-header">{resultMessage}</div>
-              <img width="40%" src={QR_CODE} />
+              <img alt="scan code" width="40%" src={QR_CODE} />
             </>
           )}
         </div>
@@ -212,32 +271,25 @@ const Agent: React.FC = () => {
       {showChooseFact && (
         <div className="dark-bg">
           <div className="game-thinking-header">请为 Agent 选择思考方向</div>
+
           <div className="flex gap-10">
-            <div
-              className="content-box"
-              onClick={() => {
-                setShowChooseFact(false);
-              }}
-            >
-              <div className="choose-fact">材质</div>
-            </div>
-            <div
-              className="content-box"
-              onClick={() => {
-                setShowChooseFact(false);
-              }}
-            >
-              <div className="choose-fact">色彩</div>
-            </div>
-            <div
-              className="content-box"
-              onClick={() => {
-                setShowChooseFact(false);
-              }}
-            >
-              <div className="choose-fact">时间</div>
-            </div>
+            {preferWords.map((word, index) => {
+              return (
+                <div
+                  role="none"
+                  key={index}
+                  className="content-box"
+                  onClick={() => {
+                    setAgent2PreferWord(word);
+                  }}
+                >
+                  {loadingSetPrefer && <Spinner />}
+                  <div className="choose-fact">{word}</div>
+                </div>
+              );
+            })}
           </div>
+          <Countdown date={Date.now() + 15000} renderer={renderer} />
         </div>
       )}
 
@@ -250,7 +302,9 @@ const Agent: React.FC = () => {
       )}
       <div className="game-content">
         <div className="game-header">
-          <div>
+          <div
+            style={{ position: "fixed", zIndex: 99, left: "10px", top: "10px" }}
+          >
             <StatusIndicator
               type={connectionStatus as StatusIndicatorProps.Type}
             >
@@ -273,6 +327,13 @@ const Agent: React.FC = () => {
           </div>
         </div>
       </div>
+      <ToastContainer
+        position="top-center"
+        hideProgressBar={true}
+        newestOnTop={true}
+        autoClose={2000}
+        theme="colored"
+      />
     </div>
   );
 };

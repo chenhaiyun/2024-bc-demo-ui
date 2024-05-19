@@ -10,7 +10,6 @@ import {
 } from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 
-// import { socket } from "../assets/ts/socket";
 import { ReadyState, useSocketIO } from "react-use-websocket";
 import { GameStatus } from "src/assets/ts/types";
 import {
@@ -47,7 +46,7 @@ const TestSend: React.FC = () => {
       JSON.stringify({
         agent_id: 0,
         content_type: GameStatus.GameBegin,
-        content: '',
+        content: "",
       })
     );
   };
@@ -122,8 +121,8 @@ const TestSend: React.FC = () => {
   const agentVoteEnd = () => {
     let underCover = randomNum();
     if (voteRound > 1) {
-      underCover =1 
-    } 
+      underCover = 1;
+    }
     setVoteUnderCover(underCover);
     sendMessage(
       JSON.stringify({
@@ -134,7 +133,7 @@ const TestSend: React.FC = () => {
         trueUnderCover: underCoverNum,
       })
     );
-    setVoteRound((prev)=>prev+1)
+    setVoteRound((prev) => prev + 1);
   };
 
   // Find the agent who is undercover
