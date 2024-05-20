@@ -7,7 +7,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { GameStatus, MessageType } from "src/assets/ts/types";
+import {
+  ContentEndType,
+  GameStatus,
+  MessageType,
+  VoteType,
+} from "src/assets/ts/types";
 import {
   API_URL,
   CURRENT_GAME_WORDS,
@@ -28,18 +33,19 @@ const Agent: React.FC = () => {
   const [showChooseFact, setShowChooseFact] = useState(false);
   const [showReadyVote, setShowReadyVote] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>("");
-  const [roundNumber, setRoundNumber] = useState(0);
+  const [roundNumber, setRoundNumber] = useState(1);
   const [showSpeakMarker, setShowSpeakMarker] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
-  const [outAgentNumbers, setOutAgentNumbers] = useState<number[]>([]);
-  const [showOutMarker, setShowOutMarker] = useState(false);
+  const [outPlayers, setOutPlayers] = useState<string[]>([]);
   const [showUnderCoverMarker, setShowUnderCoverMarker] = useState(false);
-  const [showMessage, setShowMessage] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [messageContent, setMessageContent] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
   const [preferWords, setPreferWords] = useState<string[]>([]);
   const [loadingSetPrefer, setLoadingSetPrefer] = useState(false);
+  const [commonWords, setCommonWords] = useState("");
+  const [underCoverWords, setUnderCoverWords] = useState("");
 
   const renderer = ({ seconds, completed }: CountdownRenderProps) => {
     if (completed) {
@@ -59,11 +65,8 @@ const Agent: React.FC = () => {
   // Start Game
   const setAgent2PreferWord = (word: string) => {
     setLoadingSetPrefer(true);
-    const payload = {
-      prefer_words_in: word,
-    };
     axios
-      .post(`${API_URL}/game/second-agent-prefer-words`, payload)
+      .post(`${API_URL}/game/second-agent-prefer-words?prefer_words_in=${word}`)
       .then((res) => {
         console.log(res);
         setShowChooseFact(false);
@@ -90,123 +93,150 @@ const Agent: React.FC = () => {
   }, [localStorage.getItem(CURRENT_GAME_WORDS)]);
 
   useEffect(() => {
-    try {
-      const message: MessageType = JSON.parse(lastMessage?.data ?? "");
-      setCurrentStatus(message.content_type);
+    if (lastMessage) {
+      try {
+        const message: MessageType = JSON.parse(lastMessage?.data ?? "");
+        setCurrentStatus(message.content_type);
 
-      // Start Game
-      if (
-        message.agent_id === 0 &&
-        message.content_type === GameStatus.GameBegin
-      ) {
-        window.location.reload();
-      }
+        // // Start Game
+        // if (
+        //   message.agent_id === 0 &&
+        //   message.content_type === GameStatus.GameBegin
+        // ) {
+        //   window.location.reload();
+        // }
 
-      // Agent Thinking
-      if (message.content_type === GameStatus.AgentSpeakThinking) {
-        if (outAgentNumbers.includes(message.agent_id)) {
-          return;
-        } else {
-          setShowMessage(false);
+        // Game Begin
+        if (message.content_type === GameStatus.GameBegin) {
+          setThinkingMessage("");
+          setSpeakMessage("");
+          setShowChooseFact(false);
+          setCurrentStatus(GameStatus.GameBegin);
+          setShowSpeakMarker(true);
+          setGameStarted(true);
+          setShowSuccess(false);
+          setShowUnderCoverMarker(false);
+          setRoundNumber(1);
+          setMessageContent("");
+          setShowResult(false);
+          setResultMessage("");
+          setOutPlayers([]);
         }
-        setGameStarted(true);
-        if (
-          message.agent_id &&
-          id?.toString() === message.agent_id.toString()
-        ) {
+
+        // Agent Thinking
+        if (message.content_type === GameStatus.AgentSpeakThinking) {
+          if (
+            message.agent_id &&
+            id?.toString() === message.agent_id.toString()
+          ) {
+            setShowSpeakMarker(false);
+            setThinkingMessage((prev) => {
+              return prev + message.content;
+            });
+          }
+        }
+
+        // Agent Speak
+        if (message.content_type === GameStatus.AgentSpeak) {
+          if (
+            message.agent_id &&
+            id?.toString() === message.agent_id.toString()
+          ) {
+            setSpeakMessage((prev) => {
+              return prev + message.content;
+            });
+          }
+        }
+
+        // Agent Speak choose
+        if (message.content_type === GameStatus.AgentSpeakChoose) {
+          if (
+            message.agent_id &&
+            id?.toString() === message.agent_id.toString()
+          ) {
+            setShowSpeakMarker(false);
+            setShowChooseFact(true);
+          }
+        }
+
+        // Agent Turn Speak end
+        if (message.content_type === GameStatus.TurnSpeakEnd) {
           setShowSpeakMarker(false);
-          setThinkingMessage((prev) => {
-            return prev + message.content;
-          });
+          setShowChooseFact(false);
+          setShowReadyVote(true);
+          setThinkingMessage("");
+          setSpeakMessage("");
         }
-      }
 
-      // Agent Speak
-      if (message.content_type === GameStatus.AgentSpeak) {
+        // Agent Vote Thinking
+        if (message.content_type === GameStatus.AgentVoteThinking) {
+          if (
+            message.agent_id &&
+            id?.toString() === message.agent_id.toString()
+          ) {
+            setShowReadyVote(false);
+            setShowSpeakMarker(false);
+            setThinkingMessage((prev) => {
+              return prev + message.content;
+            });
+          }
+        }
+
+        // Agent Vote
         if (
           message.agent_id &&
-          id?.toString() === message.agent_id.toString()
+          id?.toString() === message.agent_id.toString() &&
+          message.content_type === GameStatus.AgentVote
         ) {
           setSpeakMessage((prev) => {
             return prev + message.content;
           });
         }
-      }
 
-      // Agent Speak choose
-      if (message.content_type === GameStatus.AgentSpeakChoose) {
-        if (
-          message.agent_id &&
-          id?.toString() === message.agent_id.toString()
-        ) {
-          setShowSpeakMarker(false);
-          setShowChooseFact(true);
+        // Agent Vote End
+        if (message.content_type === GameStatus.TurnVoteEnd) {
+          setThinkingMessage("");
+          setSpeakMessage("");
+          setRoundNumber((prev) => prev + 1);
+          if (message.content) {
+            const voteData: VoteType = message.content as unknown as VoteType;
+            // setIsOut(voteData.OutAgentId.toString() === id?.toString());
+            setOutPlayers((prev) => {
+              return [...prev, voteData.OutAgentId.toString()];
+            });
+          }
         }
-      }
 
-      // Agent Turn Speak end
-      if (message.content_type === GameStatus.TurnSpeakEnd) {
-        setShowSpeakMarker(false);
-        setShowChooseFact(false);
-        setShowReadyVote(true);
-        setThinkingMessage("");
-        setSpeakMessage("");
-        setRoundNumber((prev) => prev + 1);
-      }
+        // Game End / Undercover Found
+        if (message.content_type === GameStatus.GameEnd) {
+          toast("游戏结束", { type: "success" });
+          // set show success message
 
-      // Agent Vote Thinking
-      if (message.content_type === GameStatus.AgentVoteThinking) {
-        if (
-          message.agent_id &&
-          id?.toString() === message.agent_id.toString()
-        ) {
-          setShowReadyVote(false);
-          setShowSpeakMarker(false);
-          setThinkingMessage((prev) => {
-            return prev + message.content;
-          });
+          if (message.content) {
+            const resultData: ContentEndType =
+              message.content as unknown as ContentEndType;
+            setShowResult(true);
+            // set result message
+            setResultMessage(resultData.Status);
+            // set success content
+            setMessageContent(resultData.Status);
+            setCommonWords(resultData.CommonWord);
+            setUnderCoverWords(resultData.UndercoverWord);
+            if (resultData.UndercoverPlayerId.toString() === id?.toString()) {
+              setShowUnderCoverMarker(true);
+              if (!outPlayers.includes((id ?? 0).toString())) {
+                setShowSuccess(true);
+              }
+            } else {
+              setShowUnderCoverMarker(false);
+            }
+          }
         }
+      } catch (error) {
+        console.info(error);
       }
-
-      // Agent Vote
-      if (
-        message.agent_id &&
-        id?.toString() === message.agent_id.toString() &&
-        message.content_type === GameStatus.AgentVote
-      ) {
-        setSpeakMessage((prev) => {
-          return prev + message.content;
-        });
-      }
-
-      // Agent Vote End
-      if (message.content_type === GameStatus.TurnVoteEnd) {
-        // setShowSpeakMarker(false);
-        // setShowMessage(true);
-        // setMessageContent(message.content);
-        // if (id?.toString() === message.agent_id.toString()) {
-        //   setShowMessage(false);
-        //   if (message.voteUnderCover === message.trueUnderCover) {
-        //     setShowUnderCoverMarker(true);
-        //   } else {
-        //     setOutAgentNumbers((prev) => [...prev, message.agent_id]);
-        //     setShowOutMarker(true);
-        //   }
-        // }
-      }
-
-      // Undercover Found
-      if (message.content_type === GameStatus.GameEnd) {
-        // setShowResult(true);
-        // if (id?.toString() === message.trueUnderCover.toString()) {
-        //   setResultMessage("青花瓷");
-        // } else {
-        //   setResultMessage("白瓷");
-        // }
-      }
-    } catch (error) {
-      console.info(error);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage, id]);
 
@@ -222,6 +252,22 @@ const Agent: React.FC = () => {
     console.info("currentStatus:", currentStatus);
   }, [currentStatus]);
 
+  const showResultComp = () => {
+    if (showResult) {
+      return (
+        <>
+          <div style={{ fontSize: 24 }}>{resultMessage}</div>
+          <div className="game-thinking-header">
+            {showUnderCoverMarker ? underCoverWords : commonWords}
+          </div>
+          <img alt="scan code" width="30%" src={QR_CODE} />
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
   return (
     <div
       className="agent-container"
@@ -232,39 +278,25 @@ const Agent: React.FC = () => {
           <div className="game-thinking-header">
             {gameStarted ? "思考中..." : "已分配关键词，游戏即将开始"}
           </div>
-          {showResult && (
-            <>
-              <div className="game-thinking-header">{resultMessage}</div>
-              <img alt="scan code" width="40%" src={QR_CODE} />
-            </>
-          )}
+          {showResultComp()}
         </div>
       )}
-      {showMessage && (
+      {showSuccess && (
         <div className="dark-bg">
           <div className="game-thinking-header">{messageContent}</div>
+          {showResultComp()}
         </div>
       )}
-      {showOutMarker && (
+      {outPlayers.includes((id ?? 0)?.toString()) && !showUnderCoverMarker && (
         <div className="dark-bg dark">
           <div className="out-marker">出局</div>
-          {showResult && (
-            <>
-              <div className="game-thinking-header">{resultMessage}</div>
-              <img alt="scan code" width="40%" src={QR_CODE} />
-            </>
-          )}
+          {showResultComp()}
         </div>
       )}
       {showUnderCoverMarker && (
-        <div className="dark-bg">
+        <div className="dark-bg dark">
           <div className="under-cover-marker">卧底</div>
-          {showResult && (
-            <>
-              <div className="game-thinking-header">{resultMessage}</div>
-              <img alt="scan code" width="40%" src={QR_CODE} />
-            </>
-          )}
+          {showResultComp()}
         </div>
       )}
 
@@ -293,7 +325,7 @@ const Agent: React.FC = () => {
         </div>
       )}
 
-      {showReadyVote && (
+      {!outPlayers.includes((id ?? 0).toString()) && showReadyVote && (
         <div className="dark-bg">
           <div className="game-thinking-header">
             第 {roundNumber} 发言轮结束， 准备投票
@@ -308,7 +340,7 @@ const Agent: React.FC = () => {
             <StatusIndicator
               type={connectionStatus as StatusIndicatorProps.Type}
             >
-              {connectionStatus}
+              {connectionStatus} / Round {roundNumber} / ({currentStatus})
             </StatusIndicator>
           </div>
           <div>Header</div>

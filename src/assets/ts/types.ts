@@ -20,6 +20,21 @@ export enum GameRole {
   Civilian = "Civilian",
 }
 
+// for game end
+export interface ContentEndType {
+  Status: string;
+  CommonWord: string;
+  UndercoverWord: string;
+  UndercoverPlayerId: string;
+  UndercoverActive: string;
+}
+
+// for Turn Vote End
+export interface VoteType {
+  TurnNumber: number;
+  OutAgentId: number;
+}
+
 export interface MessageType {
   agent_id: number;
   content_type: string;
