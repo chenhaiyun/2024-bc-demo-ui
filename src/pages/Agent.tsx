@@ -98,19 +98,12 @@ const Agent: React.FC = () => {
         const message: MessageType = JSON.parse(lastMessage?.data ?? "");
         setCurrentStatus(message.content_type);
 
-        // // Start Game
-        // if (
-        //   message.agent_id === 0 &&
-        //   message.content_type === GameStatus.GameBegin
-        // ) {
-        //   window.location.reload();
-        // }
-
         // Game Begin
         if (message.content_type === GameStatus.GameBegin) {
           setThinkingMessage("");
           setSpeakMessage("");
           setShowChooseFact(false);
+          setShowReadyVote(false);
           setCurrentStatus(GameStatus.GameBegin);
           setShowSpeakMarker(true);
           setGameStarted(true);
@@ -222,11 +215,11 @@ const Agent: React.FC = () => {
             setMessageContent(resultData.Status);
             setCommonWords(resultData.CommonWord);
             setUnderCoverWords(resultData.UndercoverWord);
+            if (!outPlayers.includes((id ?? 0).toString())) {
+              setShowSuccess(true);
+            }
             if (resultData.UndercoverPlayerId.toString() === id?.toString()) {
               setShowUnderCoverMarker(true);
-              if (!outPlayers.includes((id ?? 0).toString())) {
-                setShowSuccess(true);
-              }
             } else {
               setShowUnderCoverMarker(false);
             }
@@ -260,7 +253,7 @@ const Agent: React.FC = () => {
           <div className="game-thinking-header">
             {showUnderCoverMarker ? underCoverWords : commonWords}
           </div>
-          <img alt="scan code" width="30%" src={QR_CODE} />
+          <img alt="scan code" width="250" src={QR_CODE} />
         </>
       );
     } else {
