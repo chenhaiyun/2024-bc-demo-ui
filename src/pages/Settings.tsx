@@ -16,6 +16,8 @@ const Settings: React.FC = () => {
   const [loadingWords, setLoadingWords] = useState(false);
   const [loadingStart, setLoadingStart] = useState(false);
   const [loadingReset, setLoadingReset] = useState(false);
+  const [loadingPause, setLoadingPause] = useState(false);
+  const [loadingContinue, setLoadingContinue] = useState(false);
   const [currentOption, setCurrentOption] = useState<SelectProps.Option | null>(
     JSON.parse(localStorage.getItem(CURRENT_GAME_WORDS) ?? "null")
   );
@@ -110,6 +112,52 @@ const Settings: React.FC = () => {
       });
   };
 
+  // Pause Game
+  const pauseGame = async () => {
+    setLoadingPause(false);
+    axios
+      .post(`${API_URL}/game/pause`)
+      .then((res) => {
+        toast("暂停成功", {
+          type: "success",
+        });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoadingPause(false);
+      });
+  };
+
+  // Continue Game
+  const continueGame = async () => {
+    setLoadingContinue(true);
+    axios
+      .post(`${API_URL}/game/continue`)
+      .then((res) => {
+        toast("继续成功", {
+          type: "success",
+        });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoadingContinue(false);
+      });
+  };
+
   useEffect(() => {
     getWords();
   }, []);
@@ -126,6 +174,24 @@ const Settings: React.FC = () => {
       <Form
         actions={
           <SpaceBetween direction="horizontal" size="xs">
+            <Button
+              disabled={loadingWords}
+              loading={loadingPause}
+              onClick={() => {
+                pauseGame();
+              }}
+            >
+              暂停
+            </Button>
+            <Button
+              disabled={loadingWords}
+              loading={loadingContinue}
+              onClick={() => {
+                continueGame();
+              }}
+            >
+              继续
+            </Button>
             <Button
               iconName="refresh"
               disabled={loadingWords}

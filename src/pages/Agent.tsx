@@ -56,7 +56,7 @@ const Agent: React.FC = () => {
   // Below is keyboard control
   const escapePressed = useKeyPress("Escape");
   const enterPressed = useKeyPress("Enter");
-  const sPressed = useKeyPress("s");
+  const rPressed = useKeyPress("r");
   const pPressed = useKeyPress("p");
   const num1Pressed = useKeyPress("1");
   const num2Pressed = useKeyPress("2");
@@ -86,7 +86,7 @@ const Agent: React.FC = () => {
     axios
       .post(`${API_URL}/game/pause`)
       .then((res) => {
-        toast("重置成功", {
+        toast("暂停", {
           type: "success",
         });
         console.log(res);
@@ -105,7 +105,7 @@ const Agent: React.FC = () => {
     axios
       .post(`${API_URL}/game/continue`)
       .then((res) => {
-        toast("重置成功", {
+        toast("继续", {
           type: "success",
         });
         console.log(res);
@@ -131,11 +131,11 @@ const Agent: React.FC = () => {
   }, [enterPressed]);
 
   useEffect(() => {
-    console.info("sPressed:", sPressed);
-    if (sPressed) {
+    console.info("rPressed:", rPressed);
+    if (rPressed) {
       continueGame();
     }
-  }, [sPressed]);
+  }, [rPressed]);
 
   useEffect(() => {
     console.info("pPressed:", pPressed);
@@ -146,14 +146,26 @@ const Agent: React.FC = () => {
 
   useEffect(() => {
     console.info("num1Pressed:", num1Pressed);
+    if (num1Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
+      setAgent2PreferWord(preferWords[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num1Pressed]);
 
   useEffect(() => {
     console.info("num2Pressed:", num2Pressed);
+    if (num2Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
+      setAgent2PreferWord(preferWords[1]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num2Pressed]);
 
   useEffect(() => {
     console.info("enterPressed:", num3Pressed);
+    if (num3Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
+      setAgent2PreferWord(preferWords[2]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num3Pressed]);
 
   const renderer = ({ seconds, completed }: CountdownRenderProps) => {
