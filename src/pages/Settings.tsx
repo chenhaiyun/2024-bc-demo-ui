@@ -5,12 +5,19 @@ import {
   Select,
   SelectProps,
   SpaceBetween,
+  StatusIndicator,
+  StatusIndicatorProps,
 } from "@cloudscape-design/components";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { API_URL, CURRENT_GAME_WORDS } from "src/assets/ts/utils";
+import {
+  API_URL,
+  CURRENT_GAME_WORDS,
+  WEBSOCKET_URL,
+} from "src/assets/ts/utils";
 import { ToastContainer, toast } from "react-toastify";
-import { GameWordsType } from "src/assets/ts/types";
+import { GameStatus, GameWordsType } from "src/assets/ts/types";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 const Settings: React.FC = () => {
   const [loadingWords, setLoadingWords] = useState(false);
@@ -23,6 +30,27 @@ const Settings: React.FC = () => {
   );
   const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const { lastMessage, readyState, sendMessage } = useWebSocket(
+    `${WEBSOCKET_URL}/game/ws/controller`,
+    {
+      onOpen: () => console.log("opened"),
+      //Will attempt to reconnect on all close events, such as server shutting down
+      shouldReconnect: () => true,
+    }
+  );
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "loading",
+    [ReadyState.OPEN]: "success",
+    [ReadyState.CLOSING]: "closing",
+    [ReadyState.CLOSED]: "error",
+    [ReadyState.UNINSTANTIATED]: "pending",
+  }[readyState];
+
+  useEffect(() => {
+    console.info("lastMessage:", lastMessage);
+  }, [lastMessage]);
 
   // Get China Game Words
   const getWords = () => {
@@ -158,6 +186,16 @@ const Settings: React.FC = () => {
       });
   };
 
+  const refreshPage = () => {
+    sendMessage(
+      JSON.stringify({
+        agent_id: 0,
+        content_type: GameStatus.Custom,
+        content: GameStatus.Refresh,
+      })
+    );
+  };
+
   useEffect(() => {
     getWords();
   }, []);
@@ -195,6 +233,14 @@ const Settings: React.FC = () => {
             <Button
               iconName="refresh"
               disabled={loadingWords}
+              onClick={() => {
+                refreshPage();
+              }}
+            >
+              刷新
+            </Button>
+            <Button
+              disabled={loadingWords}
               loading={loadingReset}
               onClick={() => {
                 resetGame();
@@ -214,6 +260,9 @@ const Settings: React.FC = () => {
           </SpaceBetween>
         }
       >
+        <StatusIndicator type={connectionStatus as StatusIndicatorProps.Type}>
+          {connectionStatus}
+        </StatusIndicator>
         <FormField
           label="游戏关键词"
           description="请选择游戏关键词"

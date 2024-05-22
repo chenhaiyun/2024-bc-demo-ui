@@ -221,6 +221,14 @@ const Agent: React.FC = () => {
 
         console.info("message.content_type:", message);
         // Reset Game
+        if (message.content_type === GameStatus.Custom) {
+          const content: MessageType = JSON.parse(message.content);
+          if (content.content === GameStatus.Refresh) {
+            window.location.reload();
+          }
+        }
+
+        // Reset Game
         if (message.content_type === GameStatus.GameReset) {
           window.location.reload();
         }
