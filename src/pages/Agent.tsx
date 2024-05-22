@@ -23,6 +23,7 @@ import Countdown, { CountdownRenderProps } from "react-countdown";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import useKeyPress from "src/hooks/useKeypress";
+import MessageDisplay from "src/components/Message";
 
 const Agent: React.FC = () => {
   const { id } = useParams();
@@ -388,7 +389,7 @@ const Agent: React.FC = () => {
           <div className="game-thinking-header">
             {showUnderCoverMarker ? underCoverWords : commonWords}
           </div>
-          <img alt="scan code" width="250" src={QR_CODE} />
+          <img alt="scan code" width="150" src={QR_CODE} />
         </>
       );
     } else {
@@ -477,7 +478,7 @@ const Agent: React.FC = () => {
         <div className="game-agent-thinking">
           <div className="game-thinking-header">Agent {id} Thinking...</div>
           <div className="content-box thinking">
-            {thinkingMessage || "正在思考..."}
+            {<MessageDisplay message={thinkingMessage} /> || "正在思考..."}
           </div>
         </div>
         <div className="game-agent-statement">
