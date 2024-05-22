@@ -22,6 +22,7 @@ import QR_CODE from "src/assets/qrcode.png";
 import Countdown, { CountdownRenderProps } from "react-countdown";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import useKeyPress from "src/hooks/useKeypress";
 
 const Agent: React.FC = () => {
   const { id } = useParams();
@@ -30,10 +31,10 @@ const Agent: React.FC = () => {
   const { lastMessage, readyState } = useWebSocket(
     `${WEBSOCKET_URL}/game/ws/${id}`,
     {
-      onOpen: () => console.log('opened'),
+      onOpen: () => console.log("opened"),
       //Will attempt to reconnect on all close events, such as server shutting down
       shouldReconnect: () => true,
-    },
+    }
   );
   const [showChooseFact, setShowChooseFact] = useState(false);
   const [showReadyVote, setShowReadyVote] = useState(false);
@@ -51,6 +52,109 @@ const Agent: React.FC = () => {
   const [loadingSetPrefer, setLoadingSetPrefer] = useState(false);
   const [commonWords, setCommonWords] = useState("");
   const [underCoverWords, setUnderCoverWords] = useState("");
+
+  // Below is keyboard control
+  const escapePressed = useKeyPress("Escape");
+  const enterPressed = useKeyPress("Enter");
+  const sPressed = useKeyPress("s");
+  const pPressed = useKeyPress("p");
+  const num1Pressed = useKeyPress("1");
+  const num2Pressed = useKeyPress("2");
+  const num3Pressed = useKeyPress("3");
+
+  // Reset Game
+  const resetGame = async () => {
+    axios
+      .post(`${API_URL}/game/reset`)
+      .then((res) => {
+        toast("重置成功", {
+          type: "success",
+        });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      });
+  };
+
+  // Pause Game
+  const pauseGame = async () => {
+    axios
+      .post(`${API_URL}/game/pause`)
+      .then((res) => {
+        toast("重置成功", {
+          type: "success",
+        });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      });
+  };
+
+  // Continue Game
+  const continueGame = async () => {
+    axios
+      .post(`${API_URL}/game/continue`)
+      .then((res) => {
+        toast("重置成功", {
+          type: "success",
+        });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      });
+  };
+
+  useEffect(() => {
+    console.info("escapePressed:", escapePressed);
+    if (escapePressed) {
+      resetGame();
+    }
+  }, [escapePressed]);
+
+  useEffect(() => {
+    console.info("enterPressed:", enterPressed);
+  }, [enterPressed]);
+
+  useEffect(() => {
+    console.info("sPressed:", sPressed);
+    if (sPressed) {
+      continueGame();
+    }
+  }, [sPressed]);
+
+  useEffect(() => {
+    console.info("pPressed:", pPressed);
+    if (pPressed) {
+      pauseGame();
+    }
+  }, [pPressed]);
+
+  useEffect(() => {
+    console.info("num1Pressed:", num1Pressed);
+  }, [num1Pressed]);
+
+  useEffect(() => {
+    console.info("num2Pressed:", num2Pressed);
+  }, [num2Pressed]);
+
+  useEffect(() => {
+    console.info("enterPressed:", num3Pressed);
+  }, [num3Pressed]);
 
   const renderer = ({ seconds, completed }: CountdownRenderProps) => {
     if (completed) {
@@ -103,9 +207,10 @@ const Agent: React.FC = () => {
         const message: MessageType = JSON.parse(lastMessage?.data ?? "");
         setCurrentStatus(message.content_type);
 
+        console.info("message.content_type:", message);
         // Reset Game
         if (message.content_type === GameStatus.GameReset) {
-          window.location.reload()
+          window.location.reload();
         }
 
         // Game Begin

@@ -14,14 +14,13 @@ import { GameWordsType } from "src/assets/ts/types";
 
 const Settings: React.FC = () => {
   const [loadingWords, setLoadingWords] = useState(false);
-  const [loadingData, setLoadingData] = useState(false);
+  const [loadingStart, setLoadingStart] = useState(false);
+  const [loadingReset, setLoadingReset] = useState(false);
   const [currentOption, setCurrentOption] = useState<SelectProps.Option | null>(
     JSON.parse(localStorage.getItem(CURRENT_GAME_WORDS) ?? "null")
   );
   const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
-
-  
 
   // Get China Game Words
   const getWords = () => {
@@ -60,7 +59,7 @@ const Settings: React.FC = () => {
       setErrorMessage("请选择游戏关键词");
       return;
     }
-    setLoadingData(true);
+    setLoadingStart(true);
     const payload = {
       common_word: currentOption.label,
       undercover_word: currentOption?.description?.split(":")[1],
@@ -83,15 +82,14 @@ const Settings: React.FC = () => {
         }
       })
       .finally(() => {
-        setLoadingData(false);
+        setLoadingStart(false);
       });
   };
 
   // Reset Game
   const resetGame = async () => {
-   
-    setLoadingData(true);
-    
+    setLoadingReset(true);
+
     axios
       .post(`${API_URL}/game/reset`)
       .then((res) => {
@@ -108,10 +106,9 @@ const Settings: React.FC = () => {
         }
       })
       .finally(() => {
-        setLoadingData(false);
+        setLoadingReset(false);
       });
   };
-
 
   useEffect(() => {
     getWords();
@@ -129,10 +126,10 @@ const Settings: React.FC = () => {
       <Form
         actions={
           <SpaceBetween direction="horizontal" size="xs">
-          <Button
+            <Button
               iconName="refresh"
               disabled={loadingWords}
-              loading={loadingData}
+              loading={loadingReset}
               onClick={() => {
                 resetGame();
               }}
@@ -141,7 +138,7 @@ const Settings: React.FC = () => {
             </Button>
             <Button
               disabled={loadingWords}
-              loading={loadingData}
+              loading={loadingStart}
               onClick={() => {
                 startGame();
               }}
