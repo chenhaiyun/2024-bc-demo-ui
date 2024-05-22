@@ -14,12 +14,14 @@ import { GameWordsType } from "src/assets/ts/types";
 
 const Settings: React.FC = () => {
   const [loadingWords, setLoadingWords] = useState(false);
-  const [loadingStart, setLoadingStart] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [currentOption, setCurrentOption] = useState<SelectProps.Option | null>(
     JSON.parse(localStorage.getItem(CURRENT_GAME_WORDS) ?? "null")
   );
   const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+
+  
 
   // Get China Game Words
   const getWords = () => {
@@ -53,12 +55,12 @@ const Settings: React.FC = () => {
   };
 
   // Start Game
-  const startGame = () => {
+  const startGame = async () => {
     if (!currentOption) {
       setErrorMessage("请选择游戏关键词");
       return;
     }
-    setLoadingStart(true);
+    setLoadingData(true);
     const payload = {
       common_word: currentOption.label,
       undercover_word: currentOption?.description?.split(":")[1],
@@ -81,9 +83,35 @@ const Settings: React.FC = () => {
         }
       })
       .finally(() => {
-        setLoadingStart(false);
+        setLoadingData(false);
       });
   };
+
+  // Reset Game
+  const resetGame = async () => {
+   
+    setLoadingData(true);
+    
+    axios
+      .post(`${API_URL}/game/reset`)
+      .then((res) => {
+        toast("执行成功", {
+          type: "success",
+        });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoadingData(false);
+      });
+  };
+
 
   useEffect(() => {
     getWords();
@@ -101,9 +129,19 @@ const Settings: React.FC = () => {
       <Form
         actions={
           <SpaceBetween direction="horizontal" size="xs">
+          <Button
+              iconName="refresh"
+              disabled={loadingWords}
+              loading={loadingData}
+              onClick={() => {
+                resetGame();
+              }}
+            >
+              重置
+            </Button>
             <Button
               disabled={loadingWords}
-              loading={loadingStart}
+              loading={loadingData}
               onClick={() => {
                 startGame();
               }}

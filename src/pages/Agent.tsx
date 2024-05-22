@@ -28,7 +28,12 @@ const Agent: React.FC = () => {
   const [thinkingMessage, setThinkingMessage] = useState("");
   const [speakMessage, setSpeakMessage] = useState("");
   const { lastMessage, readyState } = useWebSocket(
-    `${WEBSOCKET_URL}/game/ws/${id}`
+    `${WEBSOCKET_URL}/game/ws/${id}`,
+    {
+      onOpen: () => console.log('opened'),
+      //Will attempt to reconnect on all close events, such as server shutting down
+      shouldReconnect: () => true,
+    },
   );
   const [showChooseFact, setShowChooseFact] = useState(false);
   const [showReadyVote, setShowReadyVote] = useState(false);
@@ -97,6 +102,11 @@ const Agent: React.FC = () => {
       try {
         const message: MessageType = JSON.parse(lastMessage?.data ?? "");
         setCurrentStatus(message.content_type);
+
+        // Reset Game
+        if (message.content_type === GameStatus.GameReset) {
+          window.location.reload()
+        }
 
         // Game Begin
         if (message.content_type === GameStatus.GameBegin) {

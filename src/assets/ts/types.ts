@@ -14,6 +14,8 @@ export enum GameStatus {
   AgentVoteEnd = "AgentVoteEnd",
   TurnVoteEnd = "TurnVoteEnd",
   GameEnd = "GameEnd",
+  GameReset = 'GameReset',
+  Custom = 'Custom',
 }
 export enum GameRole {
   Undercover = "Undercover",
