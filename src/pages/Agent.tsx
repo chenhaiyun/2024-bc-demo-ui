@@ -24,6 +24,14 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import useKeyPress from "src/hooks/useKeypress";
 import MessageDisplay from "src/components/Message";
+import { GridLoader } from "react-spinners";
+
+const NOT_SHOW_MESSAGES: string[] = [
+  "**Thinking:**",
+  "**Speak:**",
+  "**VoteThinking:**",
+  "**Vote:**",
+];
 
 const Agent: React.FC = () => {
   const { id } = useParams();
@@ -48,7 +56,6 @@ const Agent: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [messageContent, setMessageContent] = useState("");
   const [showResult, setShowResult] = useState(false);
-  const [resultMessage, setResultMessage] = useState("");
   const [preferWords, setPreferWords] = useState<string[]>([]);
   const [loadingSetPrefer, setLoadingSetPrefer] = useState(false);
   const [commonWords, setCommonWords] = useState("");
@@ -99,7 +106,7 @@ const Agent: React.FC = () => {
   };
 
   // Start Game
-  const startGame = async () => {
+  const startGame = async (isFirst = false) => {
     setLoadingStart(true);
     if (gameOptions.length <= 0) {
       toast("请等待关键词加载完成", { type: "error" });
@@ -117,9 +124,11 @@ const Agent: React.FC = () => {
     axios
       .post(`${API_URL}/game/begin`, payload)
       .then((res) => {
-        // toast("执行成功", {
-        //   type: "success",
-        // });
+        if (isFirst) {
+          toast("执行成功", {
+            type: "success",
+          });
+        }
         console.log(res);
       })
       .catch((error) => {
@@ -201,7 +210,7 @@ const Agent: React.FC = () => {
   useEffect(() => {
     console.info("enterPressed:", enterPressed);
     if (enterPressed) {
-      startGame();
+      startGame(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enterPressed]);
@@ -298,6 +307,10 @@ const Agent: React.FC = () => {
         const message: MessageType = JSON.parse(lastMessage?.data ?? "");
         setCurrentStatus(message.content_type);
 
+        if (NOT_SHOW_MESSAGES.includes(message.content)) {
+          message.content = "";
+        }
+
         console.info("message.content_type:", message);
         // Reset Game
         if (message.content_type === GameStatus.Custom) {
@@ -326,7 +339,6 @@ const Agent: React.FC = () => {
           setRoundNumber(1);
           setMessageContent("");
           setShowResult(false);
-          setResultMessage("");
           setOutPlayers([]);
         }
 
@@ -392,6 +404,15 @@ const Agent: React.FC = () => {
           }
         }
 
+        // Agent Turn Vote Start
+        if (
+          message.agent_id &&
+          id?.toString() === message.agent_id.toString() &&
+          message.content_type === GameStatus.TurnVoteBegin
+        ) {
+          setSpeakMessage("投票给: ");
+        }
+
         // Agent Vote
         if (
           message.agent_id &&
@@ -426,8 +447,6 @@ const Agent: React.FC = () => {
             const resultData: ContentEndType =
               message.content as unknown as ContentEndType;
             setShowResult(true);
-            // set result message
-            setResultMessage(resultData.Status);
             // set success content
             setMessageContent(resultData.Status);
             setCommonWords(resultData.CommonWord);
@@ -475,7 +494,6 @@ const Agent: React.FC = () => {
     if (showResult) {
       return (
         <>
-          <div style={{ fontSize: 24 }}>{resultMessage}</div>
           <div className="game-thinking-header">
             {showUnderCoverMarker ? underCoverWords : commonWords}
           </div>
@@ -495,7 +513,11 @@ const Agent: React.FC = () => {
       {showSpeakMarker && (
         <div className="dark-bg">
           <div className="game-thinking-header">
-            {gameStarted ? "思考中..." : "已分配关键词，游戏即将开始"}
+            {gameStarted ? (
+              <GridLoader size={50} color="rgba(255,255,255,0.9)" />
+            ) : (
+              "已分配关键词，游戏即将开始"
+            )}
           </div>
           {showResultComp()}
         </div>
@@ -553,7 +575,7 @@ const Agent: React.FC = () => {
       {!outPlayers.includes((id ?? 0).toString()) && showReadyVote && (
         <div className="dark-bg">
           <div className="game-thinking-header">
-            第 {roundNumber} 发言轮结束， 准备投票
+            第 {roundNumber} 轮发言结束， 准备投票
           </div>
         </div>
       )}

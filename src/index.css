@@ -104,23 +104,27 @@ body {
 }
 
 .agent-container.agent-1 {
-  background-position: right bottom;
+  background-position: calc(100% + 150px) calc(100% + 100px);
 }
 
 .agent-container.agent-2 {
-  background-position: right bottom;
+  background-position: calc(100% + 150px) calc(100% + 100px);
 }
 
 .agent-container.agent-3 {
-  background-position: right bottom;
+  background-position: calc(100% + 150px) calc(100% + 100px);
 }
 
 .agent-container.agent-4 {
-  background-position: right bottom;
+  background-position: calc(100% + 150px) calc(100% + 100px);
 }
 
 .agent-container.agent-5 {
-  background-position: right bottom;
+  background-position: calc(100% + 150px) calc(100% + 100px);
+}
+
+.agent-container.agent-6 {
+  background-position: calc(100% + 150px) calc(100% + 100px);
 }
 
 .content-box {
