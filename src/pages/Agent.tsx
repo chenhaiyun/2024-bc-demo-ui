@@ -106,7 +106,8 @@ const Agent: React.FC = () => {
       return;
     }
     const randomNumber = Math.floor(Math.random() * gameOptions.length);
-    const currentOption = gameOptions[randomNumber];
+    const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
+    setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label,
       undercover_word: currentOption?.description?.split(":")[1],
