@@ -1,6 +1,5 @@
 import {
   SelectProps,
-  Spinner,
   StatusIndicator,
   StatusIndicatorProps,
 } from "@cloudscape-design/components";
@@ -57,6 +56,7 @@ const Agent: React.FC = () => {
   const [loadingWords, setLoadingWords] = useState(false);
   const [loadingStart, setLoadingStart] = useState(false);
   const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
+  const [currentSelect, setCurrentSelect] = useState(-1);
 
   // Below is keyboard control
   const escapePressed = useKeyPress("Escape");
@@ -224,6 +224,7 @@ const Agent: React.FC = () => {
     console.info("num1Pressed:", num1Pressed);
     if (num1Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
       setAgent2PreferWord(preferWords[0]);
+      setCurrentSelect(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num1Pressed]);
@@ -232,6 +233,7 @@ const Agent: React.FC = () => {
     console.info("num2Pressed:", num2Pressed);
     if (num2Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
       setAgent2PreferWord(preferWords[1]);
+      setCurrentSelect(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num2Pressed]);
@@ -240,6 +242,7 @@ const Agent: React.FC = () => {
     console.info("num3Pressed:", num3Pressed);
     if (num3Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
       setAgent2PreferWord(preferWords[2]);
+      setCurrentSelect(2);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num3Pressed]);
@@ -330,6 +333,7 @@ const Agent: React.FC = () => {
         // Agent Thinking
         if (message.content_type === GameStatus.AgentSpeakThinking) {
           setShowChooseFact(false);
+          setCurrentSelect(-1);
           if (
             message.agent_id &&
             id?.toString() === message.agent_id.toString()
@@ -525,13 +529,19 @@ const Agent: React.FC = () => {
                 <div
                   role="none"
                   key={index}
-                  className="content-choose-box"
+                  className={`${
+                    index === currentSelect
+                      ? "content-choose-box  active"
+                      : "content-choose-box"
+                  }`}
                   onClick={() => {
                     setAgent2PreferWord(word);
                   }}
                 >
-                  {loadingSetPrefer && <Spinner />}
-                  <div className="choose-fact">{word}</div>
+                  <div className="choose-fact">
+                    {/* {loadingSetPrefer && <Spinner />} */}
+                    {word}
+                  </div>
                 </div>
               );
             })}
@@ -559,6 +569,9 @@ const Agent: React.FC = () => {
             )}
             {loadingWords && (
               <StatusIndicator type="loading">加载词</StatusIndicator>
+            )}
+            {loadingSetPrefer && (
+              <StatusIndicator type="loading">方向</StatusIndicator>
             )}
             <StatusIndicator
               type={connectionStatus as StatusIndicatorProps.Type}
