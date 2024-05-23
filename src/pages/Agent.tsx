@@ -10,6 +10,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import {
   ContentEndType,
   GameStatus,
+  GameWordsType,
   MessageType,
   VoteType,
 } from "src/assets/ts/types";
@@ -41,7 +42,7 @@ const Agent: React.FC = () => {
   const [showReadyVote, setShowReadyVote] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>("");
   const [roundNumber, setRoundNumber] = useState(1);
-  const [showSpeakMarker, setShowSpeakMarker] = useState(false);
+  const [showSpeakMarker, setShowSpeakMarker] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
   const [outPlayers, setOutPlayers] = useState<string[]>([]);
   const [showUnderCoverMarker, setShowUnderCoverMarker] = useState(false);
@@ -53,6 +54,9 @@ const Agent: React.FC = () => {
   const [loadingSetPrefer, setLoadingSetPrefer] = useState(false);
   const [commonWords, setCommonWords] = useState("");
   const [underCoverWords, setUnderCoverWords] = useState("");
+  const [loadingWords, setLoadingWords] = useState(false);
+  const [loadingStart, setLoadingStart] = useState(false);
+  const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
 
   // Below is keyboard control
   const escapePressed = useKeyPress("Escape");
@@ -62,6 +66,72 @@ const Agent: React.FC = () => {
   const num1Pressed = useKeyPress("1");
   const num2Pressed = useKeyPress("2");
   const num3Pressed = useKeyPress("3");
+
+  // Get China Game Words
+  const getWords = () => {
+    setLoadingWords(true);
+    axios
+      .get(`${API_URL}/game/china-ware-words`)
+      .then((result) => {
+        console.log(result);
+        const wordList: GameWordsType[] = result.data;
+        setGameOptions(
+          wordList.map((word) => ({
+            label: word.common_word,
+            description: `卧底词: ${word.undercover_word}`,
+            value: word.common_word,
+            tags: word.prefer_words,
+          }))
+        );
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, {
+            type: "error",
+          });
+        } else {
+          toast(error, { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoadingWords(false);
+      });
+  };
+
+  // Start Game
+  const startGame = async () => {
+    setLoadingStart(true);
+    if (gameOptions.length <= 0) {
+      toast("请等待关键词加载完成", { type: "error" });
+      return;
+    }
+    const randomNumber = Math.floor(Math.random() * gameOptions.length);
+    const currentOption = gameOptions[randomNumber];
+    const payload = {
+      common_word: currentOption.label,
+      undercover_word: currentOption?.description?.split(":")[1],
+      is_about_chinaware: true,
+      prefer_words: currentOption.tags,
+    };
+    axios
+      .post(`${API_URL}/game/begin`, payload)
+      .then((res) => {
+        // toast("执行成功", {
+        //   type: "success",
+        // });
+        console.log(res);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          toast(error.message, { type: "error" });
+        } else {
+          toast(error, { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoadingStart(false);
+      });
+  };
 
   // Reset Game
   const resetGame = async () => {
@@ -129,6 +199,10 @@ const Agent: React.FC = () => {
 
   useEffect(() => {
     console.info("enterPressed:", enterPressed);
+    if (enterPressed) {
+      startGame();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enterPressed]);
 
   useEffect(() => {
@@ -361,6 +435,11 @@ const Agent: React.FC = () => {
               setShowUnderCoverMarker(false);
             }
           }
+
+          // set time out to start game
+          setTimeout(() => {
+            startGame();
+          }, 10000);
         }
       } catch (error) {
         console.info(error);
@@ -381,6 +460,10 @@ const Agent: React.FC = () => {
   useEffect(() => {
     console.info("currentStatus:", currentStatus);
   }, [currentStatus]);
+
+  useEffect(() => {
+    getWords();
+  }, []);
 
   const showResultComp = () => {
     if (showResult) {
@@ -468,7 +551,13 @@ const Agent: React.FC = () => {
             <div className="aws-logo"></div>
             <div className="ym-logo"></div>
           </div>
-          <div>
+          <div className="flex gap-10">
+            {loadingStart && (
+              <StatusIndicator type="loading">开始</StatusIndicator>
+            )}
+            {loadingWords && (
+              <StatusIndicator type="loading">加载词</StatusIndicator>
+            )}
             <StatusIndicator
               type={connectionStatus as StatusIndicatorProps.Type}
             >
