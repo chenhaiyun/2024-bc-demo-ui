@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 :root {
   --base-font-size: 16px;
@@ -46,6 +47,8 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  font-family: "Microsoft YaHei", Arial, sans-serif; /* 优先使用微软雅黑，如果系统不支持则使用 Arial，最后使用系统默认的 sans-serif 字体 */
+  /* line-height: 1.6; */
 }
 
 .flex {
@@ -60,6 +63,38 @@ body {
   gap: 10px;
 }
 
+.gap-20 {
+  gap: 20px;
+}
+
+.game-header {
+  display: flex;
+  width: 100%;
+  background-color: #fff;
+  padding: 10px 25px;
+  justify-content: space-between;
+}
+
+.game-header .aws-logo {
+  width: 120px;
+  height: 30px;
+  background-image: url("./assets/aws-logo.png");
+  background-size: contain;
+  background-position: left center;
+  background-repeat: no-repeat;
+  display: flex;
+}
+
+.game-header .ym-logo {
+  width: 120px;
+  height: 30px;
+  background-image: url("./assets/ym-logo.png");
+  background-size: contain;
+  background-position: left center;
+  background-repeat: no-repeat;
+  display: flex;
+}
+
 .agent-container {
   width: 100vw;
   height: 100vh;
@@ -68,8 +103,28 @@ body {
   background-size: auto 70%;
 }
 
+.agent-container.agent-1 {
+  background-position: right bottom;
+}
+
+.agent-container.agent-2 {
+  background-position: right bottom;
+}
+
+.agent-container.agent-3 {
+  background-position: right bottom;
+}
+
+.agent-container.agent-4 {
+  background-position: right bottom;
+}
+
+.agent-container.agent-5 {
+  background-position: right bottom;
+}
+
 .content-box {
-  padding: 1vw 1vh;
+  padding: 10px;
   border: 1px solid #fff;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
@@ -79,19 +134,21 @@ body {
 
 .content-box.thinking {
   width: 65vw;
-  max-height: 30vh;
+  height: 30vh;
+  border-radius: 20px;
 }
 
 .content-box.statement {
   width: 50vw;
-  max-height: 40vh;
+  height: 30vh;
+  border-radius: 10px;
 }
 
 .game-thinking-header,
 .game-statement-header {
   color: #fff;
   font-size: var(--header-font-size);
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .game-content {
@@ -99,11 +156,18 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 1vw 1vh;
+}
+
+.content-inner {
+  padding: 5px 20px;
 }
 
 .dark-bg {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  /* background-image: url("./assets/blur-bg.png"); */
+  background-size: cover;
+  background-position: center center;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -116,11 +180,29 @@ body {
 }
 
 .dark-bg.dark {
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  /* background-image: url("./assets/blur-bg.png"); */
+  background-size: cover;
+  background-position: center center;
 }
 
 .dark-bg.light {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  /* background-image: url("./assets/blur-bg.png"); */
+  background-size: cover;
+  background-position: center center;
+}
+
+.content-choose-box {
+  padding: 10px;
+  /* border: 1px solid #fff; */
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(1px);
+  border-radius: 10px;
+  box-shadow: 1px 1px 4px #fff;
 }
 
 .choose-fact {

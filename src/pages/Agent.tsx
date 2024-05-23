@@ -41,7 +41,7 @@ const Agent: React.FC = () => {
   const [showReadyVote, setShowReadyVote] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>("");
   const [roundNumber, setRoundNumber] = useState(1);
-  const [showSpeakMarker, setShowSpeakMarker] = useState(true);
+  const [showSpeakMarker, setShowSpeakMarker] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [outPlayers, setOutPlayers] = useState<string[]>([]);
   const [showUnderCoverMarker, setShowUnderCoverMarker] = useState(false);
@@ -162,7 +162,7 @@ const Agent: React.FC = () => {
   }, [num2Pressed]);
 
   useEffect(() => {
-    console.info("enterPressed:", num3Pressed);
+    console.info("num3Pressed:", num3Pressed);
     if (num3Pressed && currentStatus === GameStatus.AgentSpeakChoose) {
       setAgent2PreferWord(preferWords[2]);
     }
@@ -280,6 +280,7 @@ const Agent: React.FC = () => {
         // Agent Speak choose
         if (message.content_type === GameStatus.AgentSpeakChoose) {
           if (
+            message.agent_id?.toString() === "2" &&
             message.agent_id &&
             id?.toString() === message.agent_id.toString()
           ) {
@@ -399,7 +400,7 @@ const Agent: React.FC = () => {
 
   return (
     <div
-      className="agent-container"
+      className={`agent-container agent-${id}`}
       style={{ backgroundImage: "url('/agent" + id + ".webp')" }}
     >
       {showSpeakMarker && (
@@ -431,15 +432,15 @@ const Agent: React.FC = () => {
 
       {showChooseFact && (
         <div className="dark-bg">
-          <div className="game-thinking-header">请为 Agent 选择思考方向</div>
+          <div className="game-thinking-header">请为智能体选择思考方向</div>
 
-          <div className="flex gap-10">
+          <div className="flex gap-20">
             {preferWords.map((word, index) => {
               return (
                 <div
                   role="none"
                   key={index}
-                  className="content-box"
+                  className="content-choose-box"
                   onClick={() => {
                     setAgent2PreferWord(word);
                   }}
@@ -463,28 +464,34 @@ const Agent: React.FC = () => {
       )}
       <div className="game-content">
         <div className="game-header">
-          <div
-            style={{ position: "fixed", zIndex: 99, left: "10px", top: "10px" }}
-          >
+          <div className="flex">
+            <div className="aws-logo"></div>
+            <div className="ym-logo"></div>
+          </div>
+          <div>
             <StatusIndicator
               type={connectionStatus as StatusIndicatorProps.Type}
             >
-              {connectionStatus} / Round {roundNumber} / ({currentStatus})
+              {connectionStatus} / 轮次: {roundNumber} / ({currentStatus})
             </StatusIndicator>
           </div>
-          <div>Header</div>
-          <div>Settings</div>
         </div>
-        <div className="game-agent-thinking">
-          <div className="game-thinking-header">Agent {id} Thinking...</div>
-          <div className="content-box thinking">
-            {<MessageDisplay message={thinkingMessage} /> || "正在思考..."}
+        <div className="content-inner">
+          <div className="game-agent-thinking">
+            <div className="game-thinking-header">智能体 {id} 思考...</div>
+            <div className="content-box thinking">
+              {thinkingMessage ? (
+                <MessageDisplay message={thinkingMessage} />
+              ) : (
+                "正在思考..."
+              )}
+            </div>
           </div>
-        </div>
-        <div className="game-agent-statement">
-          <div className="game-statement-header">Agent {id} says:</div>
-          <div className="content-box statement">
-            {speakMessage || "等待发言..."}
+          <div className="game-agent-statement">
+            <div className="game-statement-header">智能体 {id} 说:</div>
+            <div className="content-box statement">
+              {speakMessage || "等待发言..."}
+            </div>
           </div>
         </div>
       </div>
