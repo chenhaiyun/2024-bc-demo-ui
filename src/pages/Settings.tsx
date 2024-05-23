@@ -63,7 +63,7 @@ const Settings: React.FC = () => {
         setGameOptions(
           wordList.map((word) => ({
             label: word.common_word,
-            description: `卧底词: ${word.undercover_word}`,
+            description: `卧底词:${word.undercover_word}`,
             value: word.common_word,
             tags: word.prefer_words,
           }))

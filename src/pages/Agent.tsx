@@ -78,7 +78,7 @@ const Agent: React.FC = () => {
         setGameOptions(
           wordList.map((word) => ({
             label: word.common_word,
-            description: `卧底词: ${word.undercover_word}`,
+            description: `卧底词:${word.undercover_word}`,
             value: word.common_word,
             tags: word.prefer_words,
           }))
@@ -328,6 +328,7 @@ const Agent: React.FC = () => {
 
         // Agent Thinking
         if (message.content_type === GameStatus.AgentSpeakThinking) {
+          setShowChooseFact(false);
           if (
             message.agent_id &&
             id?.toString() === message.agent_id.toString()

@@ -130,6 +130,7 @@ body {
   color: #fff;
   overflow-y: scroll;
   scrollbar-width: none;
+  line-height: 1.4em;
 }
 
 .content-box.thinking {
