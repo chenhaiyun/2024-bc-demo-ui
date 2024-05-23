@@ -255,3 +255,10 @@ body {
 .message-list::-webkit-scrollbar {
   display: none;
 }
+
+.fixed-status {
+  position: fixed;
+  z-index: 99;
+  top: 10px;
+  right: 2px;
+}

@@ -581,6 +581,11 @@ const Agent: React.FC = () => {
       )}
       <div className="game-content">
         <div className="game-header">
+          <div className="fixed-status">
+            <StatusIndicator
+              type={connectionStatus as StatusIndicatorProps.Type}
+            ></StatusIndicator>
+          </div>
           <div className="flex">
             <div className="aws-logo"></div>
             <div className="ym-logo"></div>
@@ -595,11 +600,9 @@ const Agent: React.FC = () => {
             {loadingSetPrefer && (
               <StatusIndicator type="loading">方向</StatusIndicator>
             )}
-            <StatusIndicator
-              type={connectionStatus as StatusIndicatorProps.Type}
-            >
-              {connectionStatus} / 轮次: {roundNumber} / ({currentStatus})
-            </StatusIndicator>
+            <div>
+              轮次: {roundNumber} / ({currentStatus})
+            </div>
           </div>
         </div>
         <div className="content-inner">
