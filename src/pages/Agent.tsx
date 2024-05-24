@@ -583,7 +583,7 @@ const Agent: React.FC = () => {
         text: text,
         token: process.env.TTS_APP_TOKEN,
         format: "wav",
-        voice: VOICE_LIST[parseInt(id ?? "")],
+        voice: VOICE_LIST[parseInt(id ?? "") - 1],
       };
       const response = await fetch(`/tts`, {
         method: "POST",
