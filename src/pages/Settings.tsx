@@ -91,8 +91,8 @@ const Settings: React.FC = () => {
     }
     setLoadingStart(true);
     const payload = {
-      common_word: currentOption.label,
-      undercover_word: currentOption?.description?.split(":")[1],
+      common_word: currentOption.label?.trim(),
+      undercover_word: currentOption?.description?.split(":")[1]?.trim(),
       is_about_chinaware: true,
       prefer_words: currentOption.tags,
     };

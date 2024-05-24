@@ -34,6 +34,15 @@ const NOT_SHOW_MESSAGES: string[] = [
   "**Vote:**",
 ];
 
+const VOICE_LIST = [
+  "ruoxi",
+  "xiaogang",
+  "sicheng",
+  "aida",
+  "sitong",
+  "aicheng",
+];
+
 const Agent: React.FC = () => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -66,6 +75,11 @@ const Agent: React.FC = () => {
   const [loadingStart, setLoadingStart] = useState(false);
   const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
   const [currentSelect, setCurrentSelect] = useState(-1);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // const [audioBlob, setAudioBlob] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [audioSrc, setAudioSrc] = useState<any>("");
 
   // Below is keyboard control
   const escapePressed = useKeyPress("Escape");
@@ -127,8 +141,8 @@ const Agent: React.FC = () => {
     const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
     setPreferWords(currentOption.tags ?? []);
     const payload = {
-      common_word: currentOption.label,
-      undercover_word: currentOption?.description?.split(":")[1],
+      common_word: currentOption.label?.trim(),
+      undercover_word: currentOption?.description?.split(":")[1]?.trim(),
       is_about_chinaware: true,
       prefer_words: currentOption.tags,
     };
@@ -402,8 +416,11 @@ const Agent: React.FC = () => {
             message.agent_id &&
             id?.toString() === message.agent_id.toString()
           ) {
-            setSpeakMessage((prev) => {
-              return prev + message.content;
+            getTTSByTxt(message.content, () => {
+              // setSpeakMessage(message.content);
+              setSpeakMessage((prev) => {
+                return prev + message.content;
+              });
             });
           }
         }
@@ -458,8 +475,11 @@ const Agent: React.FC = () => {
           id?.toString() === message.agent_id.toString() &&
           message.content_type === GameStatus.AgentVote
         ) {
-          setSpeakMessage((prev) => {
-            return prev + message.content;
+          getTTSByTxt(message.content, () => {
+            // setSpeakMessage(message.content);
+            setSpeakMessage((prev) => {
+              return prev + message.content;
+            });
           });
         }
 
@@ -541,6 +561,50 @@ const Agent: React.FC = () => {
       );
     } else {
       return <></>;
+    }
+  };
+
+  useEffect(() => {
+    const playAudio = () => {
+      if (audioSrc) {
+        const audio = new Audio(audioSrc);
+        audio.play();
+      }
+    };
+
+    // 在页面加载后自动播放音频
+    playAudio();
+  }, [audioSrc]);
+
+  const getTTSByTxt = async (text: string, callback: () => void) => {
+    try {
+      const postData = {
+        appkey: process.env.TTS_APP_KEY,
+        text: text,
+        token: process.env.TTS_APP_TOKEN,
+        format: "wav",
+        voice: VOICE_LIST[parseInt(id ?? "")],
+      };
+      const response = await fetch(`/tts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // 根据需要设置请求头
+        },
+        body: JSON.stringify(postData), // 将参数转换为 JSON 字符串
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const blob = await response.blob();
+      const audioSrc = URL.createObjectURL(blob);
+      setAudioSrc(audioSrc);
+      if (callback) {
+        callback();
+      }
+    } catch (error) {
+      // handle error
+      callback();
+      console.info(error);
     }
   };
 
@@ -674,6 +738,12 @@ const Agent: React.FC = () => {
         autoClose={2000}
         theme="colored"
       />
+      <div style={{ position: "fixed", left: -99990, top: -999999 }}>
+        <audio controls autoPlay>
+          <source src={audioSrc} type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
     </div>
   );
 };
