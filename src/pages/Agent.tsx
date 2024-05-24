@@ -25,6 +25,7 @@ import { ToastContainer, toast } from "react-toastify";
 import useKeyPress from "src/hooks/useKeypress";
 import MessageDisplay from "src/components/Message";
 import { GridLoader } from "react-spinners";
+import { useTranslation } from "react-i18next";
 
 const NOT_SHOW_MESSAGES: string[] = [
   "**Thinking:**",
@@ -35,6 +36,7 @@ const NOT_SHOW_MESSAGES: string[] = [
 
 const Agent: React.FC = () => {
   const { id } = useParams();
+  const { t, i18n } = useTranslation();
   const [thinkingMessage, setThinkingMessage] = useState("");
   const [speakMessage, setSpeakMessage] = useState("");
   const { lastMessage, readyState } = useWebSocket(
@@ -74,6 +76,15 @@ const Agent: React.FC = () => {
   const num2Pressed = useKeyPress("2");
   const num3Pressed = useKeyPress("3");
 
+  // Change Language Key
+  const ePressed = useKeyPress("e");
+  const cPressed = useKeyPress("c");
+
+  // Change language
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   // Get China Game Words
   const getWords = () => {
     setLoadingWords(true);
@@ -109,7 +120,7 @@ const Agent: React.FC = () => {
   const startGame = async (isFirst = false) => {
     setLoadingStart(true);
     if (gameOptions.length <= 0) {
-      toast("请等待关键词加载完成", { type: "error" });
+      toast(t("waitKeyWords"), { type: "error" });
       return;
     }
     const randomNumber = Math.floor(Math.random() * gameOptions.length);
@@ -125,7 +136,7 @@ const Agent: React.FC = () => {
       .post(`${API_URL}/game/begin`, payload)
       .then((res) => {
         if (isFirst) {
-          toast("执行成功", {
+          toast(t("gameStarted"), {
             type: "success",
           });
         }
@@ -148,7 +159,7 @@ const Agent: React.FC = () => {
     axios
       .post(`${API_URL}/game/reset`)
       .then((res) => {
-        toast("重置成功", {
+        toast(t("resetSuccess"), {
           type: "success",
         });
         console.log(res);
@@ -167,7 +178,7 @@ const Agent: React.FC = () => {
     axios
       .post(`${API_URL}/game/pause`)
       .then((res) => {
-        toast("暂停", {
+        toast(t("pause"), {
           type: "success",
         });
         console.log(res);
@@ -186,7 +197,7 @@ const Agent: React.FC = () => {
     axios
       .post(`${API_URL}/game/continue`)
       .then((res) => {
-        toast("继续", {
+        toast(t("continue"), {
           type: "success",
         });
         console.log(res);
@@ -205,6 +216,7 @@ const Agent: React.FC = () => {
     if (escapePressed) {
       resetGame();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [escapePressed]);
 
   useEffect(() => {
@@ -220,6 +232,7 @@ const Agent: React.FC = () => {
     if (rPressed) {
       continueGame();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rPressed]);
 
   useEffect(() => {
@@ -227,6 +240,7 @@ const Agent: React.FC = () => {
     if (pPressed) {
       pauseGame();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pPressed]);
 
   useEffect(() => {
@@ -256,6 +270,24 @@ const Agent: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [num3Pressed]);
 
+  // change to English
+  useEffect(() => {
+    console.info("ePressed:", ePressed);
+    if (ePressed) {
+      changeLanguage("en");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ePressed]);
+
+  // change to Chinese
+  useEffect(() => {
+    console.info("cPressed:", cPressed);
+    if (cPressed) {
+      changeLanguage("zh");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cPressed]);
+
   const renderer = ({ seconds, completed }: CountdownRenderProps) => {
     if (completed) {
       setShowChooseFact(false);
@@ -265,7 +297,8 @@ const Agent: React.FC = () => {
       // Render a countdown
       return (
         <div className="game-thinking-header">
-          00:{seconds > 9 ? seconds : `0${seconds}`} 秒后将随机选择
+          00:{seconds > 9 ? seconds : `0${seconds}`}
+          {t("secondsAutoSelect")}
         </div>
       );
     }
@@ -410,7 +443,7 @@ const Agent: React.FC = () => {
           id?.toString() === message.agent_id.toString() &&
           message.content_type === GameStatus.TurnVoteBegin
         ) {
-          setSpeakMessage("投票给: ");
+          setSpeakMessage(t("voteTo"));
         }
 
         // Agent Vote
@@ -440,7 +473,7 @@ const Agent: React.FC = () => {
 
         // Game End / Undercover Found
         if (message.content_type === GameStatus.GameEnd) {
-          toast("游戏结束", { type: "success" });
+          toast(t("gameEnd"), { type: "success" });
           // set show success message
 
           if (message.content) {
@@ -516,7 +549,7 @@ const Agent: React.FC = () => {
             {gameStarted ? (
               <GridLoader size={50} color="rgba(255,255,255,0.9)" />
             ) : (
-              "已分配关键词，游戏即将开始"
+              t("clickToStartGame")
             )}
           </div>
           {showResultComp()}
@@ -530,20 +563,20 @@ const Agent: React.FC = () => {
       )}
       {outPlayers.includes((id ?? 0)?.toString()) && !showUnderCoverMarker && (
         <div className="dark-bg dark">
-          <div className="out-marker">出局</div>
+          <div className="out-marker">{t("out")}</div>
           {showResultComp()}
         </div>
       )}
       {showUnderCoverMarker && (
         <div className="dark-bg dark">
-          <div className="under-cover-marker">卧底</div>
+          <div className="under-cover-marker">{t("underCover")}</div>
           {showResultComp()}
         </div>
       )}
 
       {showChooseFact && (
         <div className="dark-bg">
-          <div className="game-thinking-header">请为智能体选择思考方向</div>
+          <div className="game-thinking-header">{t("selectDirection")}</div>
 
           <div className="flex gap-20">
             {preferWords.map((word, index) => {
@@ -575,7 +608,7 @@ const Agent: React.FC = () => {
       {!outPlayers.includes((id ?? 0).toString()) && showReadyVote && (
         <div className="dark-bg">
           <div className="game-thinking-header">
-            第 {roundNumber} 轮发言结束， 准备投票
+            {t("the")} {roundNumber} {t("waitingVote")}
           </div>
         </div>
       )}
@@ -592,34 +625,38 @@ const Agent: React.FC = () => {
           </div>
           <div className="flex gap-10">
             {loadingStart && (
-              <StatusIndicator type="loading">开始</StatusIndicator>
+              <StatusIndicator type="loading">开</StatusIndicator>
             )}
             {loadingWords && (
-              <StatusIndicator type="loading">加载词</StatusIndicator>
+              <StatusIndicator type="loading">词</StatusIndicator>
             )}
             {loadingSetPrefer && (
-              <StatusIndicator type="loading">方向</StatusIndicator>
+              <StatusIndicator type="loading">方</StatusIndicator>
             )}
             <div>
-              轮次: {roundNumber} / ({currentStatus})
+              {t("round")} {roundNumber} / ({currentStatus})
             </div>
           </div>
         </div>
         <div className="content-inner">
           <div className="game-agent-thinking">
-            <div className="game-thinking-header">智能体 {id} 思考...</div>
+            <div className="game-thinking-header">
+              {t("agent")} {id} {t("think")}
+            </div>
             <div className="content-box thinking">
               {thinkingMessage ? (
                 <MessageDisplay message={thinkingMessage} />
               ) : (
-                "正在思考..."
+                t("thinking")
               )}
             </div>
           </div>
           <div className="game-agent-statement">
-            <div className="game-statement-header">智能体 {id} 说:</div>
+            <div className="game-statement-header">
+              {t("agent")} {id} {t("say")}
+            </div>
             <div className="content-box statement">
-              {speakMessage || "等待发言..."}
+              {speakMessage || t("waitSaying")}
             </div>
           </div>
         </div>

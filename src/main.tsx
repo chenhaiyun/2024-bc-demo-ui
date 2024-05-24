@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import "@cloudscape-design/global-styles/index.css";
 import "react-toastify/dist/ReactToastify.css";
+import "./i18n";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   // <React.StrictMode>

@@ -1,0 +1,24 @@
+{
+  "translation": {
+    "agent": "智能体",
+    "think": "思考...",
+    "say": "说: ",
+    "thinking": "正在思考...",
+    "waitSaying": "等待发言...",
+    "waitKeyWords": "请等待关键词加载完成",
+    "clickToStartGame": "请点击开始按钮开始游戏",
+    "gameStarted": "游戏开始",
+    "resetSuccess": "重置成功",
+    "pause": "暂停",
+    "continue": "继续",
+    "secondsAutoSelect": " 秒后将随机选择",
+    "voteTo": "投票给: ",
+    "gameEnd": "游戏结束",
+    "out": "出局",
+    "underCover": "卧底",
+    "selectDirection": "请为智能体选择思考方向",
+    "the": "第 ",
+    "waitingVote": "轮发言结束， 准备投票",
+    "round": "轮: "
+  }
+}

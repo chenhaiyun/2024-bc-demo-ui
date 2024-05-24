@@ -1,0 +1,24 @@
+{
+  "translation": {
+    "agent": "Agent",
+    "think": "Thinking...",
+    "say": "Say: ",
+    "thinking": "Thinking...",
+    "waitSaying": "Waiting to speak...",
+    "waitKeyWords": "Please wait for keywords to load",
+    "clickToStartGame": "Please click the start button to begin the game",
+    "gameStarted": "Game started",
+    "resetSuccess": "Reset successful",
+    "pause": "Pause",
+    "continue": "Continue",
+    "secondsAutoSelect": " seconds until random selection",
+    "voteTo": "Vote to: ",
+    "gameEnd": "Game over",
+    "out": "Out",
+    "underCover": "Undercover",
+    "selectDirection": "Please select a thinking direction for the agent",
+    "the": "The ",
+    "waitingVote": "Round of speaking over, preparing to vote",
+    "round": "Round: "
+  }
+}
