@@ -139,13 +139,13 @@ body {
 
 .content-box.thinking {
   width: 65vw;
-  height: 30vh;
+  height: 45vh;
   border-radius: 20px;
 }
 
 .content-box.statement {
   width: 50vw;
-  height: 30vh;
+  height: 15vh;
   border-radius: 10px;
 }
 

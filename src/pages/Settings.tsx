@@ -196,6 +196,26 @@ const Settings: React.FC = () => {
     );
   };
 
+  const changeToZH = () => {
+    sendMessage(
+      JSON.stringify({
+        agent_id: 0,
+        content_type: GameStatus.Custom,
+        content: GameStatus.ChangeToZH,
+      })
+    );
+  };
+
+  const changeToEN = () => {
+    sendMessage(
+      JSON.stringify({
+        agent_id: 0,
+        content_type: GameStatus.Custom,
+        content: GameStatus.ChangeToEN,
+      })
+    );
+  };
+
   useEffect(() => {
     getWords();
   }, []);
@@ -212,6 +232,20 @@ const Settings: React.FC = () => {
       <Form
         actions={
           <SpaceBetween direction="horizontal" size="xs">
+            <Button
+              onClick={() => {
+                changeToZH();
+              }}
+            >
+              中文
+            </Button>
+            <Button
+              onClick={() => {
+                changeToEN();
+              }}
+            >
+              英文
+            </Button>
             <Button
               disabled={loadingWords}
               loading={loadingPause}

@@ -2,7 +2,7 @@
   "translation": {
     "agent": "Agent",
     "think": "Thinking...",
-    "say": "Say: ",
+    "say": "Says: ",
     "thinking": "Thinking...",
     "waitSaying": "Waiting to speak...",
     "waitKeyWords": "Please wait for keywords to load",
@@ -18,7 +18,7 @@
     "underCover": "Undercover",
     "selectDirection": "Please select a thinking direction for the agent",
     "the": "The ",
-    "waitingVote": "Round of speaking over, preparing to vote",
+    "waitingVote": " round of speaking over, preparing to vote",
     "round": "Round: "
   }
 }

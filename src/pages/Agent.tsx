@@ -351,6 +351,12 @@ const Agent: React.FC = () => {
           if (content.content === GameStatus.Refresh) {
             window.location.reload();
           }
+          if (content.content === GameStatus.ChangeToZH) {
+            changeLanguage("zh");
+          }
+          if (content.content === GameStatus.ChangeToEN) {
+            changeLanguage("en");
+          }
         }
 
         // Reset Game
