@@ -77,6 +77,8 @@ const Agent: React.FC = () => {
   const [loadingStart, setLoadingStart] = useState(false);
   const [gameOptions, setGameOptions] = useState<SelectProps.Option[]>([]);
   const [currentSelect, setCurrentSelect] = useState(-1);
+  const [showMyWord, setShowMyWord] = useState(false);
+  const [myWord, setMyWord] = useState("");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // const [audioBlob, setAudioBlob] = useState<any>(null);
@@ -395,6 +397,8 @@ const Agent: React.FC = () => {
           setMessageContent("");
           setShowResult(false);
           setOutPlayers([]);
+          setShowMyWord(false);
+          setMyWord("");
         }
 
         // Agent Thinking
@@ -410,6 +414,12 @@ const Agent: React.FC = () => {
               return prev + message.content;
             });
           }
+        }
+
+        // My Word
+        if (message.content_type === GameStatus.MyWord) {
+          setShowMyWord(true);
+          setMyWord(message.content);
         }
 
         // Agent Speak
@@ -715,6 +725,7 @@ const Agent: React.FC = () => {
         <div className="content-inner">
           <div className="game-agent-thinking">
             <div className="game-thinking-header">
+              {showMyWord && myWord && <span>[{myWord}]</span>}
               {t("agent")} {id} {t("think")}
             </div>
             <div className="content-box thinking">

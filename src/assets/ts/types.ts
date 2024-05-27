@@ -1,5 +1,6 @@
 export enum GameStatus {
   GameBegin = "GameBegin",
+  MyWord = "MyWord",
   TurnSpeakBegin = "TurnSpeakBegin",
   AgentSpeakBegin = "AgentSpeakBegin",
   AgentSpeakThinking = "AgentSpeakThinking", // single agent
