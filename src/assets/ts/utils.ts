@@ -1,5 +1,5 @@
-export const WEBSOCKET_URL = "ws://localhost:8000";
-export const API_URL = "http://localhost:8000";
+export const WEBSOCKET_URL = "ws://127.0.0.1:8000";
+export const API_URL = "http://127.0.0.1:8000";
 export const CURRENT_GAME_WORDS = "summit-2024-current_game_words";
 
 const commonChineseCharacters = ["我", "是", "谁"];
