@@ -137,6 +137,10 @@ body {
   line-height: 1.4em;
 }
 
+.content-box ul {
+  padding-left: 10px;
+}
+
 .content-box.thinking {
   width: 65vw;
   height: 45vh;
