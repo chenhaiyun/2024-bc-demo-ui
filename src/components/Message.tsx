@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 interface MessageDisplayProps {
   message: string;
 }
@@ -16,7 +17,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message }) => {
 
   return (
     <div className="message-list">
-      <div>{message}</div>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message}</ReactMarkdown>
       <div ref={messageEndRef} />
     </div>
   );
