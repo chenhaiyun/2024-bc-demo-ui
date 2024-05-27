@@ -221,6 +221,12 @@ body {
   font-size: 5vw;
 }
 
+.choose-order {
+  padding-top: 0.5vh;
+  font-size: 4vw;
+  text-align: center;
+}
+
 .out-marker {
   color: #fff;
   padding: 20px;

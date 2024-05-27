@@ -43,6 +43,8 @@ const VOICE_LIST = [
   "aicheng",
 ];
 
+const ORDER_NUM = ["A", "B", "C"];
+
 const Agent: React.FC = () => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -663,6 +665,7 @@ const Agent: React.FC = () => {
                     setAgent2PreferWord(word);
                   }}
                 >
+                  <div className="choose-order">{ORDER_NUM[index]}</div>
                   <div className="choose-fact">
                     {/* {loadingSetPrefer && <Spinner />} */}
                     {word}
