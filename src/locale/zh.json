@@ -1,5 +1,6 @@
 {
   "translation": {
+    "Player": "智能体",
     "agent": "智能体",
     "think": "思考...",
     "say": "说: ",

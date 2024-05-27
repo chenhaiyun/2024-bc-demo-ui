@@ -1,5 +1,6 @@
 {
   "translation": {
+    "Player": "Agent",
     "agent": "Agent",
     "think": "Thinking...",
     "say": "Says: ",

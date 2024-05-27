@@ -509,7 +509,8 @@ const Agent: React.FC = () => {
               message.content as unknown as ContentEndType;
             setShowResult(true);
             // set success content
-            setMessageContent(resultData.Status);
+            const resultTxt = resultData.Status.replace("Player", t("Player"));
+            setMessageContent(resultTxt);
             setCommonWords(resultData.CommonWord);
             setUnderCoverWords(resultData.UndercoverWord);
             if (!outPlayers.includes((id ?? 0).toString())) {
