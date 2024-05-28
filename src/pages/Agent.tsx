@@ -181,7 +181,7 @@ const Agent: React.FC = () => {
     if (isDebug) {
       toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`);
     }
-    broadCastPreferWords(JSON.stringify(currentOption.tags));
+    broadCastPreferWords(currentOption.tags);
     // setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label?.trim(),
