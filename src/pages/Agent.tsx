@@ -547,7 +547,7 @@ const Agent: React.FC = () => {
           // set time out to start game
           setTimeout(() => {
             startGame();
-          }, 10000);
+          }, 20000);
         }
       } catch (error) {
         console.info(error);
