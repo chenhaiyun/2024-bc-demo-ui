@@ -13,11 +13,7 @@ import {
   MessageType,
   VoteType,
 } from "src/assets/ts/types";
-import {
-  API_URL,
-  CURRENT_GAME_WORDS,
-  WEBSOCKET_URL,
-} from "src/assets/ts/utils";
+import { API_URL, WEBSOCKET_URL } from "src/assets/ts/utils";
 import QR_CODE from "src/assets/qrcode.png";
 import Countdown, { CountdownRenderProps } from "react-countdown";
 import axios from "axios";
@@ -346,14 +342,14 @@ const Agent: React.FC = () => {
       });
   };
 
-  useEffect(() => {
-    const words = localStorage.getItem(CURRENT_GAME_WORDS);
-    if (words) {
-      const data: SelectProps.Option = JSON.parse(words);
-      setPreferWords((data.tags as string[]) ?? []);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localStorage.getItem(CURRENT_GAME_WORDS)]);
+  // useEffect(() => {
+  //   const words = localStorage.getItem(CURRENT_GAME_WORDS);
+  //   if (words) {
+  //     const data: SelectProps.Option = JSON.parse(words);
+  //     setPreferWords((data.tags as string[]) ?? []);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [localStorage.getItem(CURRENT_GAME_WORDS)]);
 
   useEffect(() => {
     if (lastMessage) {
@@ -378,6 +374,11 @@ const Agent: React.FC = () => {
           if (content.content === GameStatus.ChangeToEN) {
             changeLanguage("en");
           }
+        }
+
+        // Set Prefer Words
+        if (message.content_type === GameStatus.SetPreferWords) {
+          setPreferWords(JSON.parse(message.content));
         }
 
         // Reset Game
@@ -569,10 +570,10 @@ const Agent: React.FC = () => {
     if (showResult) {
       return (
         <>
+          <img alt="scan code" width="150" src={QR_CODE} />
           <div className="game-thinking-header">
             {showUnderCoverMarker ? underCoverWords : commonWords}
           </div>
-          <img alt="scan code" width="150" src={QR_CODE} />
         </>
       );
     } else {
@@ -642,7 +643,7 @@ const Agent: React.FC = () => {
           {showResultComp()}
         </div>
       )}
-      {showSuccess && (
+      {!showUnderCoverMarker && showSuccess && (
         <div className="dark-bg">
           <div className="game-thinking-header">{messageContent}</div>
           {showResultComp()}

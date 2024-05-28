@@ -20,6 +20,7 @@ export enum GameStatus {
   Refresh = "Refresh",
   ChangeToZH = "ChangeToZH",
   ChangeToEN = "ChangeToEN",
+  SetPreferWords = "SetPreferWords",
 }
 export enum GameRole {
   Undercover = "Undercover",

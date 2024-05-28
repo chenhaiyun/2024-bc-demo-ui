@@ -102,6 +102,7 @@ const Settings: React.FC = () => {
         toast("执行成功", {
           type: "success",
         });
+        setPreferWords((currentOption?.tags as string[]) ?? []);
         console.log(res);
       })
       .catch((error) => {
@@ -212,6 +213,16 @@ const Settings: React.FC = () => {
         agent_id: 0,
         content_type: GameStatus.Custom,
         content: GameStatus.ChangeToEN,
+      })
+    );
+  };
+
+  const setPreferWords = (words: string[]) => {
+    sendMessage(
+      JSON.stringify({
+        agent_id: 0,
+        content_type: GameStatus.SetPreferWords,
+        content: words.toString(),
       })
     );
   };
