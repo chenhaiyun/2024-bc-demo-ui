@@ -103,6 +103,12 @@ const Agent: React.FC = () => {
     i18n.changeLanguage(lng);
   };
 
+  useEffect(() => {
+    if (isDebug) {
+      toast(`DEBUG: preferWords:, ${JSON.stringify(preferWords)}`);
+    }
+  }, [preferWords]);
+
   // Get China Game Words
   const getWords = () => {
     setLoadingWords(true);
@@ -147,7 +153,7 @@ const Agent: React.FC = () => {
     }
     const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
     if (isDebug) {
-      toast(`DEBUG: currentOption:, ${currentOption}`);
+      toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`);
     }
     setPreferWords(currentOption.tags ?? []);
     const payload = {
