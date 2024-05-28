@@ -85,6 +85,7 @@ const Agent: React.FC = () => {
   const signal = controller.signal;
 
   // Below is keyboard control
+  const xPressed = useKeyPress("x");
   const escapePressed = useKeyPress("Escape");
   const enterPressed = useKeyPress("Enter");
   const rPressed = useKeyPress("r");
@@ -227,6 +228,12 @@ const Agent: React.FC = () => {
         }
       });
   };
+
+  useEffect(() => {
+    if (xPressed) {
+      window.location.reload();
+    }
+  }, [xPressed]);
 
   useEffect(() => {
     console.info("escapePressed:", escapePressed);
