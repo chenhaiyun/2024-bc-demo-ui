@@ -154,7 +154,7 @@ const Agent: React.FC = () => {
       agent_id: 0,
       content_type: GameStatus.Custom,
       content: JSON.stringify({
-        type: GameStatus.SetPreferWords,
+        content_type: GameStatus.SetPreferWords,
         words: words,
       }),
     };
