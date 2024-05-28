@@ -114,7 +114,7 @@ const Agent: React.FC = () => {
 
   useEffect(() => {
     if (isDebug) {
-      toast(`DEBUG: preferWords:, ${JSON.stringify(preferWords)}`);
+      toast(`DEBUG: preferWords: ${JSON.stringify(preferWords)}`);
     }
   }, [preferWords]);
 
