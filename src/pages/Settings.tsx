@@ -21,7 +21,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 
 const Settings: React.FC = () => {
   const [loadingWords, setLoadingWords] = useState(false);
-  const [loadingStart, setLoadingStart] = useState(false);
+  // const [loadingStart, setLoadingStart] = useState(false);
   const [loadingReset, setLoadingReset] = useState(false);
   const [loadingPause, setLoadingPause] = useState(false);
   const [loadingContinue, setLoadingContinue] = useState(false);
@@ -84,12 +84,13 @@ const Settings: React.FC = () => {
   };
 
   // Start Game
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const startGame = async () => {
     if (!currentOption) {
       setErrorMessage("请选择游戏关键词");
       return;
     }
-    setLoadingStart(true);
+    // setLoadingStart(true);
     const payload = {
       common_word: currentOption.label?.trim(),
       undercover_word: currentOption?.description?.split(":")[1]?.trim(),
@@ -113,7 +114,7 @@ const Settings: React.FC = () => {
         }
       })
       .finally(() => {
-        setLoadingStart(false);
+        // setLoadingStart(false);
       });
   };
 
@@ -293,7 +294,7 @@ const Settings: React.FC = () => {
             >
               重置
             </Button>
-            <Button
+            {/* <Button
               disabled={loadingWords}
               loading={loadingStart}
               onClick={() => {
@@ -301,7 +302,7 @@ const Settings: React.FC = () => {
               }}
             >
               开始游戏
-            </Button>
+            </Button> */}
           </SpaceBetween>
         }
       >
