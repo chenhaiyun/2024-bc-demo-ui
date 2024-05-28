@@ -13,7 +13,7 @@ import {
   MessageType,
   VoteType,
 } from "src/assets/ts/types";
-import { API_URL, WEBSOCKET_URL } from "src/assets/ts/utils";
+import { API_URL, isDebug, WEBSOCKET_URL } from "src/assets/ts/utils";
 import QR_CODE from "src/assets/qrcode.png";
 import Countdown, { CountdownRenderProps } from "react-countdown";
 import axios from "axios";
@@ -142,7 +142,13 @@ const Agent: React.FC = () => {
       return;
     }
     const randomNumber = Math.floor(Math.random() * gameOptions.length);
+    if (isDebug) {
+      toast(`DEBUG: randomNumber:, ${randomNumber}`);
+    }
     const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
+    if (isDebug) {
+      toast(`DEBUG: currentOption:, ${currentOption}`);
+    }
     setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label?.trim(),
