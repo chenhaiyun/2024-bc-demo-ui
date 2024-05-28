@@ -113,6 +113,7 @@ const Agent: React.FC = () => {
   };
 
   useEffect(() => {
+    console.info("preferWords:", preferWords);
     if (isDebug) {
       toast(`DEBUG: preferWords: ${JSON.stringify(preferWords)}`);
     }
@@ -184,7 +185,7 @@ const Agent: React.FC = () => {
       toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`);
     }
     broadCastPreferWords(currentOption.tags);
-    setPreferWords(currentOption.tags ?? []);
+    // setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label?.trim(),
       undercover_word: currentOption?.description?.split(":")[1]?.trim(),
@@ -561,6 +562,7 @@ const Agent: React.FC = () => {
 
         // Agent Vote End
         if (message.content_type === GameStatus.TurnVoteEnd) {
+          broadCastPreferWords([]);
           setThinkingMessage("");
           setSpeakMessage("");
           setRoundNumber((prev) => prev + 1);
@@ -617,10 +619,6 @@ const Agent: React.FC = () => {
     [ReadyState.CLOSED]: "error",
     [ReadyState.UNINSTANTIATED]: "pending",
   }[readyState];
-
-  useEffect(() => {
-    console.info("currentStatus:", currentStatus);
-  }, [currentStatus]);
 
   useEffect(() => {
     getWords();
