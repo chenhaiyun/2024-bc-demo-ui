@@ -75,6 +75,7 @@ const Agent: React.FC = () => {
   const [currentSelect, setCurrentSelect] = useState(-1);
   const [showMyWord, setShowMyWord] = useState(false);
   const [myWord, setMyWord] = useState("");
+  const [currentNumber, setCurrentNumber] = useState<number>(0);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // const [audioBlob, setAudioBlob] = useState<any>(null);
@@ -101,6 +102,11 @@ const Agent: React.FC = () => {
   // Change language
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+  };
+
+  const generateNextNumber = () => {
+    const nextNumber = (currentNumber + 1) % gameOptions.length;
+    setCurrentNumber(nextNumber);
   };
 
   // Get China Game Words
@@ -141,8 +147,9 @@ const Agent: React.FC = () => {
       toast(t("waitKeyWords"), { type: "error" });
       return;
     }
-    const randomNumber = Math.floor(Math.random() * gameOptions.length);
-    const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
+    const currentOption = JSON.parse(
+      JSON.stringify(gameOptions[currentNumber])
+    );
     setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label?.trim(),
@@ -250,6 +257,11 @@ const Agent: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enterPressed]);
+
+  useEffect(() => {
+    startGame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentNumber]);
 
   useEffect(() => {
     console.info("rPressed:", rPressed);
@@ -383,10 +395,10 @@ const Agent: React.FC = () => {
           }
         }
 
-        // Set Prefer Words
-        if (message.content_type === GameStatus.SetPreferWords) {
-          setPreferWords(JSON.parse(message.content));
-        }
+        // // Set Prefer Words
+        // if (message.content_type === GameStatus.SetPreferWords) {
+        //   setPreferWords(JSON.parse(message.content));
+        // }
 
         // Reset Game
         if (message.content_type === GameStatus.GameReset) {
@@ -546,7 +558,7 @@ const Agent: React.FC = () => {
 
           // set time out to start game
           setTimeout(() => {
-            startGame();
+            generateNextNumber();
           }, 20000);
         }
       } catch (error) {
