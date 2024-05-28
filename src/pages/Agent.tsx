@@ -114,9 +114,7 @@ const Agent: React.FC = () => {
 
   useEffect(() => {
     if (isDebug) {
-      toast(`DEBUG: preferWords:, ${JSON.stringify(preferWords)}`, {
-        autoClose: 99999,
-      });
+      toast(`DEBUG: preferWords:, ${JSON.stringify(preferWords)}`);
     }
   }, [preferWords]);
 
@@ -161,7 +159,9 @@ const Agent: React.FC = () => {
       }),
     };
     if (isDebug) {
-      toast(`DEBUG: preferWordsObject:, ${JSON.stringify(preferWordsObject)}`);
+      toast(`DEBUG: preferWordsObject:, ${JSON.stringify(preferWordsObject)}`, {
+        autoClose: 99999,
+      });
     }
     sendBroadCastMessage(JSON.stringify(preferWordsObject));
   };
