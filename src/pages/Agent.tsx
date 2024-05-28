@@ -54,6 +54,15 @@ const Agent: React.FC = () => {
       shouldReconnect: () => true,
     }
   );
+
+  const { sendMessage: sendBroadCastMessage } = useWebSocket(
+    `${WEBSOCKET_URL}/game/ws/controller`,
+    {
+      onOpen: () => console.log("opened"),
+      //Will attempt to reconnect on all close events, such as server shutting down
+      shouldReconnect: () => true,
+    }
+  );
   const [showChooseFact, setShowChooseFact] = useState(false);
   const [showReadyVote, setShowReadyVote] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>("");
@@ -140,6 +149,16 @@ const Agent: React.FC = () => {
       });
   };
 
+  const broadCastPreferWords = (words: string) => {
+    sendBroadCastMessage(
+      JSON.stringify({
+        agent_id: 0,
+        content_type: GameStatus.SetPreferWords,
+        content: words,
+      })
+    );
+  };
+
   // Start Game
   const startGame = async (isFirst = false) => {
     setLoadingStart(true);
@@ -155,7 +174,8 @@ const Agent: React.FC = () => {
     if (isDebug) {
       toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`);
     }
-    setPreferWords(currentOption.tags ?? []);
+    broadCastPreferWords(JSON.stringify(currentOption.tags));
+    // setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label?.trim(),
       undercover_word: currentOption?.description?.split(":")[1]?.trim(),
@@ -395,10 +415,13 @@ const Agent: React.FC = () => {
           }
         }
 
-        // // Set Prefer Words
-        // if (message.content_type === GameStatus.SetPreferWords) {
-        //   setPreferWords(JSON.parse(message.content));
-        // }
+        // Set Prefer Words
+        if (message.content_type === GameStatus.SetPreferWords) {
+          if (isDebug) {
+            toast(`DEBUG: message.content: ${message.content}`);
+          }
+          setPreferWords(JSON.parse(message.content));
+        }
 
         // Reset Game
         if (message.content_type === GameStatus.GameReset) {
