@@ -150,16 +150,18 @@ const Agent: React.FC = () => {
   };
 
   const broadCastPreferWords = (words: string) => {
-    sendBroadCastMessage(
-      JSON.stringify({
-        agent_id: 0,
-        content_type: GameStatus.Custom,
-        content: JSON.stringify({
-          type: GameStatus.SetPreferWords,
-          words: words,
-        }),
-      })
-    );
+    const preferWordsObject = {
+      agent_id: 0,
+      content_type: GameStatus.Custom,
+      content: JSON.stringify({
+        type: GameStatus.SetPreferWords,
+        words: words,
+      }),
+    };
+    if (isDebug) {
+      toast(`DEBUG: preferWordsObject:, ${JSON.stringify(preferWordsObject)}`);
+    }
+    sendBroadCastMessage(JSON.stringify(preferWordsObject));
   };
 
   // Start Game
@@ -714,7 +716,7 @@ const Agent: React.FC = () => {
           <div className="game-thinking-header">{t("selectDirection")}</div>
 
           <div className="flex gap-20">
-            {preferWords.map((word, index) => {
+            {preferWords?.map((word, index) => {
               return (
                 <div
                   role="none"
