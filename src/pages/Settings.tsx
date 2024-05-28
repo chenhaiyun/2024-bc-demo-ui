@@ -84,39 +84,38 @@ const Settings: React.FC = () => {
   };
 
   // Start Game
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const startGame = async () => {
-    if (!currentOption) {
-      setErrorMessage("请选择游戏关键词");
-      return;
-    }
-    // setLoadingStart(true);
-    const payload = {
-      common_word: currentOption.label?.trim(),
-      undercover_word: currentOption?.description?.split(":")[1]?.trim(),
-      is_about_chinaware: true,
-      prefer_words: currentOption.tags,
-    };
-    axios
-      .post(`${API_URL}/game/begin`, payload)
-      .then((res) => {
-        toast("执行成功", {
-          type: "success",
-        });
-        setPreferWords((currentOption?.tags as string[]) ?? []);
-        console.log(res);
-      })
-      .catch((error) => {
-        if (error instanceof Error) {
-          toast(error.message, { type: "error" });
-        } else {
-          toast(error, { type: "error" });
-        }
-      })
-      .finally(() => {
-        // setLoadingStart(false);
-      });
-  };
+  // const startGame = async () => {
+  //   if (!currentOption) {
+  //     setErrorMessage("请选择游戏关键词");
+  //     return;
+  //   }
+  //   // setLoadingStart(true);
+  //   const payload = {
+  //     common_word: currentOption.label?.trim(),
+  //     undercover_word: currentOption?.description?.split(":")[1]?.trim(),
+  //     is_about_chinaware: true,
+  //     prefer_words: currentOption.tags,
+  //   };
+  //   axios
+  //     .post(`${API_URL}/game/begin`, payload)
+  //     .then((res) => {
+  //       toast("执行成功", {
+  //         type: "success",
+  //       });
+  //       setPreferWords((currentOption?.tags as string[]) ?? []);
+  //       console.log(res);
+  //     })
+  //     .catch((error) => {
+  //       if (error instanceof Error) {
+  //         toast(error.message, { type: "error" });
+  //       } else {
+  //         toast(error, { type: "error" });
+  //       }
+  //     })
+  //     .finally(() => {
+  //       // setLoadingStart(false);
+  //     });
+  // };
 
   // Reset Game
   const resetGame = async () => {
@@ -218,15 +217,15 @@ const Settings: React.FC = () => {
     );
   };
 
-  const setPreferWords = (words: string[]) => {
-    sendMessage(
-      JSON.stringify({
-        agent_id: 0,
-        content_type: GameStatus.SetPreferWords,
-        content: words.toString(),
-      })
-    );
-  };
+  // const setPreferWords = (words: string[]) => {
+  //   sendMessage(
+  //     JSON.stringify({
+  //       agent_id: 0,
+  //       content_type: GameStatus.SetPreferWords,
+  //       content: words.toString(),
+  //     })
+  //   );
+  // };
 
   useEffect(() => {
     getWords();
