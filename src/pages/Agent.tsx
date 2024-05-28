@@ -85,6 +85,9 @@ const Agent: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [audioSrc, setAudioSrc] = useState<any>("");
 
+  const controller = new AbortController();
+  const signal = controller.signal;
+
   // Below is keyboard control
   const escapePressed = useKeyPress("Escape");
   const enterPressed = useKeyPress("Enter");
@@ -487,7 +490,7 @@ const Agent: React.FC = () => {
           id?.toString() === message.agent_id.toString() &&
           message.content_type === GameStatus.AgentVote
         ) {
-          getTTSByTxt(message.content, () => {
+          getTTSByTxt("投票给" + message.content, () => {
             // setSpeakMessage(message.content);
             setSpeakMessage((prev) => {
               return prev + message.content;
@@ -593,12 +596,13 @@ const Agent: React.FC = () => {
     try {
       const postData = {
         appkey: process.env.TTS_APP_KEY,
-        text: text,
+        text: text.replace("_", ""),
         token: process.env.TTS_APP_TOKEN,
         format: "wav",
         voice: VOICE_LIST[parseInt(id ?? "") - 1],
       };
       const response = await fetch(`/tts`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json", // 根据需要设置请求头
