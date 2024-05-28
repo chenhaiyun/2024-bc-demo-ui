@@ -149,7 +149,7 @@ const Agent: React.FC = () => {
       });
   };
 
-  const broadCastPreferWords = (words: string) => {
+  const broadCastPreferWords = (words: string[]) => {
     const preferWordsObject = {
       agent_id: 0,
       content_type: GameStatus.Custom,
@@ -179,7 +179,9 @@ const Agent: React.FC = () => {
     }
     const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
     if (isDebug) {
-      toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`);
+      toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`, {
+        autoClose: 99999,
+      });
     }
     broadCastPreferWords(currentOption.tags);
     // setPreferWords(currentOption.tags ?? []);
@@ -411,6 +413,11 @@ const Agent: React.FC = () => {
         // Reset Game
         if (message.content_type === GameStatus.Custom) {
           const content: MessageType = JSON.parse(message.content);
+          if (isDebug) {
+            toast(`DEBUG: CUSTOM MESSAGE: ${JSON.stringify(content)}`, {
+              autoClose: 99999,
+            });
+          }
           if (content.content === GameStatus.Refresh) {
             window.location.reload();
           } else if (content.content === GameStatus.ChangeToZH) {
