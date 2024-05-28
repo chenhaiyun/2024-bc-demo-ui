@@ -159,9 +159,11 @@ const Agent: React.FC = () => {
       }),
     };
     if (isDebug) {
-      toast(`DEBUG: preferWordsObject:, ${JSON.stringify(preferWordsObject)}`, {
-        autoClose: 99999,
-      });
+      toast(
+        `DEBUG: broadCastPreferWords preferWordsObject:, ${JSON.stringify(
+          preferWordsObject
+        )}`
+      );
     }
     sendBroadCastMessage(JSON.stringify(preferWordsObject));
   };
@@ -179,12 +181,10 @@ const Agent: React.FC = () => {
     }
     const currentOption = JSON.parse(JSON.stringify(gameOptions[randomNumber]));
     if (isDebug) {
-      toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`, {
-        autoClose: 99999,
-      });
+      toast(`DEBUG: currentOption:, ${JSON.stringify(currentOption)}`);
     }
     broadCastPreferWords(currentOption.tags);
-    // setPreferWords(currentOption.tags ?? []);
+    setPreferWords(currentOption.tags ?? []);
     const payload = {
       common_word: currentOption.label?.trim(),
       undercover_word: currentOption?.description?.split(":")[1]?.trim(),
@@ -414,9 +414,7 @@ const Agent: React.FC = () => {
         if (message.content_type === GameStatus.Custom) {
           const content: MessageType = JSON.parse(message.content);
           if (isDebug) {
-            toast(`DEBUG: CUSTOM MESSAGE: ${JSON.stringify(content)}`, {
-              autoClose: 99999,
-            });
+            toast(`DEBUG: CUSTOM MESSAGE: ${JSON.stringify(content)}`);
           }
           if (content.content === GameStatus.Refresh) {
             window.location.reload();
@@ -818,7 +816,7 @@ const Agent: React.FC = () => {
         position="top-center"
         hideProgressBar={true}
         newestOnTop={true}
-        autoClose={2000}
+        autoClose={10000}
         theme="colored"
       />
       <div style={{ position: "fixed", left: -99990, top: -999999 }}>
