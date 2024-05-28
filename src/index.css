@@ -276,3 +276,9 @@ body {
   top: 10px;
   right: 2px;
 }
+
+.scan-tips {
+  margin-top: 15px;
+  color: #fff;
+  font-size: 3vw;
+}

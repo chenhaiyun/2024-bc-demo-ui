@@ -577,10 +577,11 @@ const Agent: React.FC = () => {
     if (showResult) {
       return (
         <>
-          <img alt="scan code" width="150" src={QR_CODE} />
           <div className="game-thinking-header">
             {showUnderCoverMarker ? underCoverWords : commonWords}
           </div>
+          <img alt="scan code" width="150" src={QR_CODE} />
+          <div className="scan-tips">{t("tips")}</div>
         </>
       );
     } else {
