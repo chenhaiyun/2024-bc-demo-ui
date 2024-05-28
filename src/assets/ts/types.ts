@@ -48,6 +48,7 @@ export interface MessageType {
   content: string;
   voteUnderCover: number;
   trueUnderCover: number;
+  words: string[];
 }
 
 export interface GameWordsType {

@@ -419,13 +419,18 @@ const Agent: React.FC = () => {
             changeLanguage("en");
           }
           // Set Prefer Words
-          else if (
-            JSON.parse(content.content)?.type === GameStatus.SetPreferWords
-          ) {
+          else if (content.content_type === GameStatus.SetPreferWords) {
             if (isDebug) {
-              toast(`DEBUG: message.content: ${message.content}`);
+              toast(
+                `DEBUG: SetPreferWords message.content:, ${JSON.stringify(
+                  content
+                )}`
+              );
             }
-            setPreferWords(JSON.parse(message.content).words);
+            if (isDebug) {
+              toast(`DEBUG: message.content: ${content}`);
+            }
+            setPreferWords(content.words);
           } else {
             console.info("no");
           }
