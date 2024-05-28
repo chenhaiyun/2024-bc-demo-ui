@@ -153,8 +153,11 @@ const Agent: React.FC = () => {
     sendBroadCastMessage(
       JSON.stringify({
         agent_id: 0,
-        content_type: GameStatus.SetPreferWords,
-        content: words,
+        content_type: GameStatus.Custom,
+        content: JSON.stringify({
+          type: GameStatus.SetPreferWords,
+          words: words,
+        }),
       })
     );
   };
@@ -406,21 +409,22 @@ const Agent: React.FC = () => {
           const content: MessageType = JSON.parse(message.content);
           if (content.content === GameStatus.Refresh) {
             window.location.reload();
-          }
-          if (content.content === GameStatus.ChangeToZH) {
+          } else if (content.content === GameStatus.ChangeToZH) {
             changeLanguage("zh");
-          }
-          if (content.content === GameStatus.ChangeToEN) {
+          } else if (content.content === GameStatus.ChangeToEN) {
             changeLanguage("en");
           }
-        }
-
-        // Set Prefer Words
-        if (message.content_type === GameStatus.SetPreferWords) {
-          if (isDebug) {
-            toast(`DEBUG: message.content: ${message.content}`);
+          // Set Prefer Words
+          else if (
+            JSON.parse(content.content)?.type === GameStatus.SetPreferWords
+          ) {
+            if (isDebug) {
+              toast(`DEBUG: message.content: ${message.content}`);
+            }
+            setPreferWords(JSON.parse(message.content).words);
+          } else {
+            console.info("no");
           }
-          setPreferWords(JSON.parse(message.content));
         }
 
         // Reset Game
