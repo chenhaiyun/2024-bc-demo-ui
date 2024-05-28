@@ -601,7 +601,9 @@ const Agent: React.FC = () => {
 
           // set time out to start game
           setTimeout(() => {
-            startGame();
+            if (id?.toString() === "2") {
+              startGame();
+            }
           }, 20000);
         }
       } catch (error) {
