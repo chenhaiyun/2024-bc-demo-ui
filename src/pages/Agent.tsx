@@ -816,7 +816,7 @@ const Agent: React.FC = () => {
         position="top-center"
         hideProgressBar={true}
         newestOnTop={true}
-        autoClose={10000}
+        autoClose={2000}
         theme="colored"
       />
       <div style={{ position: "fixed", left: -99990, top: -999999 }}>
